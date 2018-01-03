@@ -30,6 +30,7 @@ public:
     int connection(int portNumber);
     void work();
     Client(const Client& orig);
+    string login();
     virtual ~Client();
 private:
     int socketf,port;

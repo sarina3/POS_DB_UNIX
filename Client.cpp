@@ -49,11 +49,34 @@ int Client::connection(int portNumber) {
         cout << "failed to connect\n";
         return 0;
     }
+    char buff[255];
+    string str = this->login();
+    send(socketf,str.c_str(),255,0);
+    bzero(buff,255);
+    recv(socketf,&buff,255,0);
+    str = buff;
+    if(str == "wrong"){
+        cout << "failed to connect due to bad username or password \n";
+        return 0;
+    }
     //cout << tmp << endl;
     return 1;
     
         
 }
+
+string Client::login() {
+    string str = "";
+    string tmp;
+    cout << "Log in Foltan&Sarina&Ivanic's database:\nUsername:\n";
+    cin >> tmp;
+    str.append(tmp + ";");
+    cout << "password:\n";
+    cin >> tmp;
+    str.append(tmp);
+    return str;
+}
+
 
 void Client::work() {
     bool tmp = true;
@@ -71,12 +94,8 @@ void Client::work() {
         if(msg == "close"){
             tmp = false;
         }
-        if(send(socketf,msg.c_str(),255,0) <0){
-            cout << "failed to send\n";
-        }
-        if(recv(socketf,&buffer,sizeof(buffer),0) <0){
-            cout << "recieve failed\n";
-        }
+        send(socketf,msg.c_str(),255,0);
+        recv(socketf,&buffer,255,0);
         if(buffer == "close"){
             break;
         }

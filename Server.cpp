@@ -12,7 +12,7 @@
  */
 
 #include <string>
-
+#include "Logins.h"
 #include "Server.h"
 #include <iostream>
 
@@ -37,13 +37,43 @@ server::server(int portNumber) {
 }
 
 void* server::something() {
-    while(1){};
+    string toDo;
+    size_t position;
+    int socketNum;
+    while(1){
+        pthread_mutex_lock(&this->data->mutexToDo);
+        if(this->data->toDo->size() == 0){
+            //cout << "cakam" << endl;
+            pthread_cond_wait(&this->data->condToDo,&this->data->mutexToDo);
+        }
+        toDo = this->data->toDo->at(0);
+        for(int i = 0 ; i < this->data->toDo->size() ; i++){
+            if(i != this->data->toDo->size() - 1 ){
+                this->data->toDo->at(i) = data->toDo->at( i+1);
+            }else{
+                this->data->toDo->pop_back();
+            }
+        }
+        pthread_mutex_unlock(&this->data->mutexToDo);
+        position = toDo.find(";");
+        socketNum = stoi(toDo.substr(0,position));
+        cout << socketNum << endl;
+        toDo = toDo.erase(0,position + 1);
+        // sem pride bud switch alebo daco ine co bude volat funkcie  podla prikazu v Stringu
+        stringstream str;
+        str << socketNum << ";";
+        toDo = str.str() + toDo;
+        pthread_mutex_lock(&this->data->mutexResults);
+        this->data->results->push_back(toDo);
+        pthread_cond_broadcast(&this->data->condResults);
+        pthread_mutex_unlock(&this->data->mutexResults);
+    }
 }
 
 void* server::listening(void* pdata){
     SharedData *data = (SharedData*)(pdata);
     int socketf,newsocket;
-    
+    Logins *log = new Logins();
     if(data ->activeSockets->size() > 0){
         pthread_mutex_lock(&data->mutexSockets);
         socketf = data->activeSockets->at(data->activeSockets->size() - 1);
@@ -52,21 +82,44 @@ void* server::listening(void* pdata){
         return 0;
     }
     sockaddr_in  server_addr,client_addr;
+    char buffer[255];
+    string str;
     while(1){
     listen(socketf,5);
     socklen_t clientAddrSize = sizeof(client_addr);
     newsocket = accept(socketf,(sockaddr*)&client_addr,&clientAddrSize);
-   
-    pthread_t thread;
-    void* (*worrk) (void*) = work;
-    cout << socketf << newsocket << endl;
-    pthread_create(&thread,NULL,worrk,data);
-    pthread_mutex_lock(&data->mutexSockets);
-    data->activeSockets->push_back(newsocket);
-    pthread_mutex_unlock(&data->mutexSockets);
-    pthread_mutex_lock(&data->mutexThreads);
-    data->threads->push_back(&thread);
-    pthread_mutex_unlock(&data->mutexThreads);   
+    recv(newsocket,&buffer,255,0);
+    str = buffer;
+    size_t position = str.find(";");
+    if(position != string::npos){
+        string username = str.substr(0,position);
+        str = str.erase(0,position + 1);
+        string passwd = str;
+        cout << username << endl << passwd << endl;
+        if(log->checkUserAndPass(username,passwd)){
+            str = "succeed";
+            send(newsocket,str.c_str(),255,0);
+            pthread_t thread;
+            void* (*worrk) (void*) = work;
+            cout << socketf << newsocket << endl;
+            pthread_create(&thread,NULL,worrk,data);
+            pthread_mutex_lock(&data->mutexSockets);
+            data->activeSockets->push_back(newsocket);
+            pthread_mutex_unlock(&data->mutexSockets);
+            pthread_mutex_lock(&data->mutexThreads);
+            data->threads->push_back(&thread);
+            pthread_mutex_unlock(&data->mutexThreads);
+        }else {
+            str = "wrong";
+            send(newsocket,str.c_str(),255,0);
+            close(newsocket);
+        }
+    }else{
+        str = "wrong";
+        send(newsocket,str.c_str(),255,0);
+        close(newsocket);
+    }
+    
     
     }
     data = nullptr;
@@ -90,17 +143,48 @@ void* server::work(void* pdata){
     int n = 0;  
     while(1){
         n = recv(socketf,msg,maxPacketSize,0);
-        cout << msg;
-        cout << endl;
         message = msg;
         if(message == "close"){
             message = "closing connection";
             send(socketf,message.c_str(),maxPacketSize,0);
-             
             break;
         }
-        message = "finally \n";
+        // tu ti hadze kekeciny
+        stringstream str;
+        str << socketf << ";";
+        message = str.str() + message;
+        //cout << message << endl;
+        pthread_mutex_lock(&data->mutexToDo);
+        data->toDo->push_back(message);
+        pthread_cond_signal(&data->condToDo);
+        pthread_mutex_unlock(&data->mutexToDo);
+        pthread_mutex_lock(&data->mutexResults);
+        //cout << data->results->size() << endl;
+        if(data->results->size() >= 0){
+            //cout << "cakam" << endl;
+            pthread_cond_wait(&data->condResults,&data->mutexResults);
+            //cout << "idem" << endl;
+        }
+        bool pulled = false;
+        for(int i  = 0; i < data->results->size() ; i++){
+            string iter = data->results->at(i);
+            size_t position = iter.find(";");
+            if(stoi(iter.substr(0,position)) == socketf){
+                iter.erase(0,position + 1);
+                message = iter;
+                pulled = true;
+            }
+            if(pulled){
+                if(i != data->results->size() - 1){
+                    data->results->at(i) = data->results->at(i+1);
+                }else{
+                    data->results->pop_back();
+                }
+            }
+        }
+        pthread_mutex_unlock(&data->mutexResults);
         send(socketf,message.c_str(),maxPacketSize,0);
+        
     }
     data = nullptr;
     pthread_exit(NULL);

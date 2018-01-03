@@ -14,13 +14,15 @@
 #include "SharedData.h"
 
 SharedData::SharedData() {
+    results = new vector<string>();
     toDo = new vector<string>();
     threads = new vector<pthread_t*>();
     activeSockets = new vector<int>();
-    mutexSockets,mutexThreads,mutexToDo = PTHREAD_MUTEX_INITIALIZER;
+    mutexSockets,mutexThreads,mutexToDo,mutexResults = PTHREAD_MUTEX_INITIALIZER;
     pthread_cond_init(&condSockets,NULL);
     pthread_cond_init(&condThreads,NULL);
     pthread_cond_init(&condToDo,NULL);
+    pthread_cond_init(&condResults,NULL);
 }
 
 SharedData::SharedData(const SharedData& orig) {
