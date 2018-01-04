@@ -137,7 +137,7 @@ void* server::listening(void* pdata){
     
     
     }
-    data = nullptr;
+    data = NULL;
     pthread_exit(NULL);
 }
 void* server::work(void* pdata){
@@ -198,7 +198,7 @@ void* server::work(void* pdata){
         send(socketf,message.c_str(),maxPacketSize,0);
         
     }
-    data = nullptr;
+    data = NULL;
     pthread_exit(NULL);
 }
 
