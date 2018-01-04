@@ -16,6 +16,7 @@ public:
 	//alters
 	bool addColumns(string pNazov, string pTyp); // bolo by dobre locknut mutex aby sem nikto v tomto case nepristupil
 	bool delColumn();
+        bool writeTableToFile();
 	string toStringTable();
 	~Table();
         string name;

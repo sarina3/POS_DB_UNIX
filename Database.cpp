@@ -327,10 +327,8 @@ bool Database::porovnaj(string clenzpola, string clenfixny, string typ,string op
 }
 
 
-string Database::toString(string pTableName)
+string Database::toString(string pTableName) //ked tabulka existuje
 {
-	//pridanie moznosti citania zo zasobnika
-	//pripad ked tabulka neexistuje 
 	Table *tbl = new Table(pTableName);
 	tbl->initTable();
 	return tbl->toStringTable();

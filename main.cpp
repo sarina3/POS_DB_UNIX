@@ -46,7 +46,9 @@ int main(int argc, char** argv) {
         }
     }*/
     Database *data = new Database();
+
     cout << data->select("SELECT;meno,priezvisko;TabulkaVzor;id >= 3;","admin");
+
     return 0;
 }
 
