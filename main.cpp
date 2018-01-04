@@ -49,7 +49,8 @@ int main(int argc, char** argv) {
     Database *data = new Database();
     cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
-   
+    data->createTable("test");
+    
     return 0;
 }
 

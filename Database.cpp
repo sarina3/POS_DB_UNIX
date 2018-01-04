@@ -114,10 +114,8 @@ string Database::select(string command, string user) {
 
 
 
-string Database::toString(string pTableName)
+string Database::toString(string pTableName) //ked tabulka existuje
 {
-	//pridanie moznosti citania zo zasobnika
-	//pripad ked tabulka neexistuje 
 	Table *tbl = new Table(pTableName);
 	tbl->initTable();
 	return tbl->toStringTable();
