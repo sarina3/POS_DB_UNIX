@@ -88,7 +88,7 @@ string Database::select(string command, string user) {
     }
     Table* tableObj = new Table(table);
     if(tableObj->initTable()){
-        if(this->check(user,table)){
+        if(this->check(user,tableObj)){
             
         }else{
             return "you don't have permission to do that";

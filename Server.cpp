@@ -14,6 +14,8 @@
 #include <string>
 #include "Logins.h"
 #include "Server.h"
+#include "Commands.h"
+#include "Database.h"
 #include <iostream>
 
 server::server(int portNumber) {
@@ -66,9 +68,9 @@ void* server::something() {
         toDo.erase(0,position+1);
         position = 0;
         position = toDo.find(";");
-        switch(toDo.substr(0,position)){
-            case "SELECT":
-                toDo = this->database.select(toDo,user);
+        switch(checkInput(toDo.substr(0,position))){
+            case SELECT:
+                toDo = this->database->select(toDo,user);
                 break;
         
         }

@@ -10,9 +10,11 @@
             <file>file:/root/NetBeansProjects/semPOS/table.cpp</file>
             <file>file:/root/NetBeansProjects/semPOS/Server.h</file>
             <file>file:/root/NetBeansProjects/semPOS/main.cpp</file>
+            <file>file:/root/NetBeansProjects/semPOS/Commands.h</file>
             <file>file:/root/NetBeansProjects/semPOS/Server.cpp</file>
             <file>file:/root/NetBeansProjects/semPOS/Database.h</file>
             <file>file:/root/NetBeansProjects/semPOS/table.h</file>
+            <file>file:/root/NetBeansProjects/semPOS/Makefile</file>
             <file>file:/root/NetBeansProjects/semPOS/Database.cpp</file>
         </group>
     </open-files>

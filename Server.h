@@ -38,7 +38,7 @@ private:
     int socketf,maxPacketSize;
     sockaddr_in  server_addr,client_addr;
     string message;
-    Database database;
+    Database *database;
     char msg[255];
     SharedData *data;
     

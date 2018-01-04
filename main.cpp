@@ -10,12 +10,14 @@
  *
  * Created on December 19, 2017, 4:37 PM
  */
-#include
+
 #include <cstdlib>
 #include <iostream>
 #include <cstdio>
 #include "Server.h"
 #include "Client.h"
+#include "table.h"
+#include "Database.h"
 using namespace std;
 
 /*
@@ -23,7 +25,7 @@ using namespace std;
  */
 int main(int argc, char** argv) {
     
-    int tmp = 0;
+   /* int tmp = 0;
     cout << "1 - server \n"
             "2 - client \n";
     cin >> tmp;
@@ -41,7 +43,9 @@ int main(int argc, char** argv) {
         if(cli->connection(1026) == 1){
             cli->work();
         }
-    }
+    }*/
+    Database *data = new Database();
+    cout << data->toString("TabulkaVzor");
     return 0;
 }
 

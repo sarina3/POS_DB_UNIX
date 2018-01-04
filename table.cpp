@@ -12,7 +12,7 @@ Table::Table(string pTableName)
 	typ = new vector<string>();
 	pk = new vector<string>();
 	notNull = new vector<string>();
-       
+        rowsVector = new vector<string>();
 }
 
 bool Table::initTable()
@@ -26,7 +26,6 @@ bool Table::initTable()
 	}
 
 	string tmp = "";
-
 	while (1)
 	{
 		getline(file, tmp, ',');
@@ -72,7 +71,16 @@ bool Table::initTable()
 	while (!file.eof())
 	{
 		getline(file, tmp, ';');
-		rows = tmp;
+		rows += tmp;
+                while(1){
+                    size_t pos = tmp.find(",");
+                    if(pos == string::npos){
+                        rowsVector->push_back(tmp);
+                        break;
+                    }
+                    rowsVector->push_back(tmp.substr(0,pos));
+                    tmp.erase(0,pos +1);
+                }
 	}
 	return true;
 }
@@ -122,6 +130,15 @@ string Table::toStringTable()
 	}
 	tmp = tmp + "\n rows: ";
 	tmp = tmp + rows;
+        int pocet = 0;
+        for(string var : *rowsVector){
+            if(pocet == columns->size()){
+                pocet = 0;
+                tmp += "\n";
+            }
+            tmp += var;
+            pocet++;
+        }
 	return tmp;
 }
 
