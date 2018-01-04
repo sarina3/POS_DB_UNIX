@@ -17,7 +17,7 @@
 #include <iostream>
 
 server::server(int portNumber) {
-
+    this->database = new Database();
     this->data = new SharedData();
     this->maxPacketSize = 255;
     this->socketf = socket(AF_INET,SOCK_STREAM,0);
@@ -39,6 +39,7 @@ server::server(int portNumber) {
 void* server::something() {
     string toDo;
     size_t position;
+    string user;
     int socketNum;
     while(1){
         pthread_mutex_lock(&this->data->mutexToDo);
@@ -59,6 +60,18 @@ void* server::something() {
         socketNum = stoi(toDo.substr(0,position));
         cout << socketNum << endl;
         toDo = toDo.erase(0,position + 1);
+        position = 0;
+        position = toDo.find(";");
+        user = toDo.substr(0,position);
+        toDo.erase(0,position+1);
+        position = 0;
+        position = toDo.find(";");
+        switch(toDo.substr(0,position)){
+            case "SELECT":
+                toDo = this->database.select(toDo,user);
+                break;
+        
+        }
         // sem pride bud switch alebo daco ine co bude volat funkcie  podla prikazu v Stringu
         stringstream str;
         str << socketNum << ";";
@@ -149,21 +162,18 @@ void* server::work(void* pdata){
             send(socketf,message.c_str(),maxPacketSize,0);
             break;
         }
-        // tu ti hadze kekeciny
         stringstream str;
         str << socketf << ";";
         message = str.str() + message;
-        //cout << message << endl;
         pthread_mutex_lock(&data->mutexToDo);
         data->toDo->push_back(message);
         pthread_cond_signal(&data->condToDo);
         pthread_mutex_unlock(&data->mutexToDo);
         pthread_mutex_lock(&data->mutexResults);
-        //cout << data->results->size() << endl;
         if(data->results->size() >= 0){
-            //cout << "cakam" << endl;
+            
             pthread_cond_wait(&data->condResults,&data->mutexResults);
-            //cout << "idem" << endl;
+            
         }
         bool pulled = false;
         for(int i  = 0; i < data->results->size() ; i++){

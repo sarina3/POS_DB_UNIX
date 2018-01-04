@@ -12,6 +12,7 @@ Table::Table(string pTableName)
 	typ = new vector<string>();
 	pk = new vector<string>();
 	notNull = new vector<string>();
+       
 }
 
 bool Table::initTable()

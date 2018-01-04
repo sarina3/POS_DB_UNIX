@@ -8,14 +8,7 @@ using namespace std;
 
 class Table
 {
-	string name;
-	vector<string> *prava;
-	vector<string> *typPrava;
-	vector<string> *columns;
-	vector<string> *typ;
-	vector<string> *pk;
-	vector<string> *notNull;
-	string rows;
+	
 public:
 	Table(string pTableName);
 	
@@ -25,5 +18,14 @@ public:
 	bool delColumn();
 	string toStringTable();
 	~Table();
+        string name;
+	vector<string> *prava;
+	vector<string> *typPrava;
+	vector<string> *columns;
+	vector<string> *typ;
+	vector<string> *pk;
+	vector<string> *notNull;
+	string rows;
+        vector<string> *rowsVector;
 };
 

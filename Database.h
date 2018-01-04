@@ -11,8 +11,8 @@ public:
 	Database();
 	bool createTable(string pTableName);
 	bool findTable(string pTableName);
-
-
+        string select(string command,string user);
+        bool check(string user,Table* table);
 	string toString(string pTableName);
 	~Database();
 };

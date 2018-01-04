@@ -41,6 +41,62 @@ bool Database::findTable(string pTableName)
 	}
 }
 
+bool Database::check(string user,Table* table) {
+    bool canManage = false;
+    for(int i = 0 ; i < table->prava->size() ; i++){
+        if(user == table->prava->at(i)){
+            canManage = true;
+            break;
+        }
+    }
+    return canManage;
+}
+
+string Database::select(string command, string user) {
+    string function = "";
+    string selecting = "";
+    string table = "";
+    string conditions = "";
+    string orderby = "";
+    size_t position = 0;
+    try{
+    position = command.find(";");
+    function = command.substr(0,position);
+    command.erase(0,position+1);
+    position = 0;
+    position = command.find(";");
+    selecting = command.substr(0,position);
+    command.erase(0,position+1);
+    position = 0;
+    position = command.find(";");
+    table = command.substr(0,position);
+    command.erase(0,position+1);
+    }catch(exception e){
+        return "Error: bad syntax";
+    }
+    position = 0;
+    try{
+        position = command.find(";");
+        conditions = command.substr(0,position);
+        command.erase(0,position+1);
+        position = 0;
+        position = command.find(";");
+        orderby = command.substr(0,position);
+        command.erase(0,position+1);
+    }catch(exception e){
+
+    }
+    Table* tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,table)){
+            
+        }else{
+            return "you don't have permission to do that";
+        }
+    }
+}
+
+
 
 string Database::toString(string pTableName)
 {
