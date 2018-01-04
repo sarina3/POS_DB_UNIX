@@ -18,7 +18,7 @@
 #include "Client.h"
 #include "table.h"
 #include "Database.h"
-
+#include "table.h"
 using namespace std;
 
 /*
@@ -46,7 +46,9 @@ int main(int argc, char** argv) {
         }
     }*/
     Database *data = new Database();
-
+    cout << data->toString("TabulkaVzor");
+    //vytvaranie tabulky
+    data->createTable("test");
     cout << data->select("SELECT;meno,priezvisko;TabulkaVzor;id >= 3;","admin");
 
     return 0;
