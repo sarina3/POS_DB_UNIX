@@ -86,10 +86,26 @@ string Database::select(string command, string user) {
     }catch(exception e){
 
     }
+    string result;
     Table* tableObj = new Table(table);
     if(tableObj->initTable()){
         if(this->check(user,tableObj)){
-            
+            if(conditions != ""){
+                vector<string> *conditionParsed = new vector<string>();
+                while(1){
+                    position = conditions.find(",");
+                    if(position != string::npos){
+                        conditionParsed->push_back(conditions.substr(0,position));
+                        conditions.erase(0,position +1);
+                    }else{
+                        conditionParsed->push_back(conditions);
+                        break;
+                    }
+                }
+                for(int i = 0 ; i < conditionParsed->size();i++){
+                  
+                }
+            }
         }else{
             return "you don't have permission to do that";
         }
