@@ -287,16 +287,98 @@ string Database::deleteFromTable(string command, string user) {
                         tableObj->rowsVector->at(i + index*tableObj->columns->size()) = tableObj->rowsVector->at(i + (index + 1)*tableObj->columns->size());
                     }
                 }
+                
                 for(int i = 0 ; i < tableObj->columns->size(); i++){
                     tableObj->rowsVector->pop_back();
                 }
             }
-        return ids.size() + "rows was successfully deleted";
+        /*if(tableObj->writeTableToFile()){
+           return ids.size() + " rows was successfully deleted";
+        }else{
+            return "something went wrong";
+        }*/
+        return "preslo";
         }else{
             return "you don't have permission to do that";
         }
+        
     }else{
         return "table with that name doesn't exist";
+    }
+}
+//UPDATE;table;id,meno;4,Vlado;priezvisko == foltan
+string Database::update(string command, string user) {
+    string function;
+    string table;
+    string columns;
+    string values;
+    string conditions;
+    size_t position;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position+1);
+        position = command.find(";");
+        table = command.substr(0,position);
+        command.erase(0,position+1);
+        position = command.find(";");
+        columns = command.substr(0,position);
+        command.erase(0,position+1); position = command.find(";");
+        values = command.substr(0,position);
+        command.erase(0,position+1);
+        conditions = command;
+    }catch(exception e){
+        return "Bad syntax";
+    }
+    Table *tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,tableObj)){
+            command = "SELECT;*;" + table + ";"+conditions+";";
+            string indexes = this->select(command,user,"function");
+            vector<int> *colmunsParsed = new vector<int>();
+            vector<string> *valuesParsed = new vector<string>();
+            while(1){
+                position = columns.find(",");
+                if(position == string::npos){
+                    string col = columns;
+                    for(int i = 0 ; i < tableObj->columns->size();i++){
+                        if(col == tableObj->columns->at(i)){
+                            colmunsParsed->push_back(i);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                string col = columns.substr(0,position);
+                columns.erase(0,position + 1);
+                for(int i = 0 ; i < tableObj->columns->size();i++){
+                    if(col == tableObj->columns->at(i)){
+                        colmunsParsed->push_back(i);
+                        break;
+                    }
+                }
+            }
+            while(1){
+                position = values.find(",");
+                if(position == string::npos){
+                    valuesParsed->push_back(values);
+                    break;
+                }
+                valuesParsed->push_back(values.substr(0,position));
+                values.erase(0,position +1);
+            }
+            cout << valuesParsed->size() << colmunsParsed->size() << endl;
+            if(valuesParsed->size() == colmunsParsed->size()){
+                for(char &j : indexes){
+                    for(int i = 0 ; i < colmunsParsed->size();i++){
+                        tableObj->rowsVector->at(colmunsParsed->at(i) + ((int)j -48)*tableObj->columns->size()) = valuesParsed->at(i);
+                    }
+                }
+                return indexes.size() + "columns was updated successfully";
+            }else{
+                return "number of columns and number of values to update don't match";
+            }
+        }
     }
 }
 

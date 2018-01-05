@@ -58,6 +58,7 @@ void* server::something() {
             }
         }
         pthread_mutex_unlock(&this->data->mutexToDo);
+        cout << toDo << endl;
         position = toDo.find(";");
         socketNum = stoi(toDo.substr(0,position));
         cout << socketNum << endl;
