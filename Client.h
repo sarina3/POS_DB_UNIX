@@ -29,6 +29,7 @@ public:
     Client();
     int connection(int portNumber);
     void work();
+    void createTable();
     Client(const Client& orig);
     string login();
     virtual ~Client();
