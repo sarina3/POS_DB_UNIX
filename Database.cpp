@@ -277,18 +277,23 @@ string Database::deleteFromTable(string command, string user) {
     string ids;
     Table *tableObj = new Table(table);
     if(tableObj->initTable()){
+        if(check(user,tableObj)){
         command = "SELECT;*;"+table+";"+condition+";";
         ids = this->select(command,user,"function");
-        for(char &j : ids){
-            int index = (int)j-48;
-            for(index; index < (tableObj->rowsVector.size()/tableObj->columns->size()) - 1;index++){
+            for(char &j : ids){
+                int index = (int)j-48;
+                for(index; index < (tableObj->rowsVector->size()/tableObj->columns->size()) - 1;index++){
+                    for(int i = 0 ; i < tableObj->columns->size(); i++){
+                        tableObj->rowsVector->at(i + index*tableObj->columns->size()) = tableObj->rowsVector->at(i + (index + 1)*tableObj->columns->size());
+                    }
+                }
                 for(int i = 0 ; i < tableObj->columns->size(); i++){
-                    tableObj->rowsVector->at(i + index*tableObj->columns->size()) = tableObj->rowsVector->at(i + (index + 1)*tableObj->columns->size());
+                    tableObj->rowsVector->pop_back();
                 }
             }
-            for(int i = 0 ; i < tableObj->columns->size(); i++){
-                tableObj->rowsVector->pop_back();
-            }
+        return ids.size() + "rows was successfully deleted";
+        }else{
+            return "you don't have permission to do that";
         }
     }else{
         return "table with that name doesn't exist";
