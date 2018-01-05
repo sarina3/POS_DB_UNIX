@@ -72,6 +72,9 @@ void* server::something() {
             case SELECT:
                 toDo = this->database->select(toDo,user,"");
                 break;
+            case CreateTable:
+                toDo = this->database->createTable(toDo); //navratova hodnota pre klienta,
+                break;
         
         }
         // sem pride bud switch alebo daco ine co bude volat funkcie  podla prikazu v Stringu

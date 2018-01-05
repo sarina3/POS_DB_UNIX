@@ -106,8 +106,26 @@ void Client::work() {
     }
 }
 
-Client::createTable(){
-    //jakub
+void Client::createTable(){
+    string createTable = "";
+    string prikaz = "";
+    string odpovedServer = "";
+    while(1) //opakuje sa pokym nie je zadane meno tabulky ktore neexistuje alebo nie je napisane EXIT
+    {
+        cout << "[VyvaranieTabulky]: Zadajte nazov tabulky alebo ukoncite [EXIT] \n";
+        cin >> prikaz;
+        if(prikaz == "EXIT" || prikaz == "exit"){break;} //ked stlaci exit koncime hned
+        if(prikaz != ""){
+            //POZIADANIE O ODPOVED SERVERA
+            if(odpovedServer == "OK"){
+                cout << "Tabulka uspesne vytvorena! \n";
+                break;
+            }
+        }
+    }
+    //tu uz je tabulka vytvorena 
+    //vyskladanie stringu
+    createTable = "prava,";
 }
 
 Client::Client(const Client& orig) {
