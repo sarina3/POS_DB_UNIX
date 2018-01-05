@@ -278,7 +278,7 @@ string Database::deleteFromTable(string command, string user) {
         command = "SELECT;*;"+table+";"+condition+";";
         ids = this->select(command,user,"function");
         for(char &j : ids){
-            
+            //miloas
         }
     }
 }
