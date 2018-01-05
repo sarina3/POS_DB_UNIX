@@ -19,22 +19,22 @@
 #include <iostream>
 
 server::server(int portNumber) {
+    
     this->database = new Database();
     this->data = new SharedData();
+
     this->maxPacketSize = 255;
     this->socketf = socket(AF_INET,SOCK_STREAM,0);
     memset(&server_addr,0,sizeof(server_addr));
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(portNumber);
-    
     bind(socketf,(sockaddr *)&server_addr,sizeof(server_addr));
     this->data->activeSockets->push_back(socketf);
-    pthread_t *thread;
+    pthread_t *thread;      
     void* (*listeening)(void*) = listening;
     pthread_create(thread,NULL,listeening,data);
     data->threads->push_back(thread);
-    
     
 }
 
