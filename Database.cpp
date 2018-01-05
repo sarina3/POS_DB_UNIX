@@ -170,7 +170,7 @@ string Database::select(string command, string user) {
                         }
                     }
                     if(index != -1){
-                        if(orderby == "asc"){
+                        if(orderby == "desc"){
                             for(int i = 0 ; i < result.size() - 1 ; i++){
                                 for(int j = 0 ; j  < result.size() - i - 1 ;j++){
                                     if(this->porovnaj(tableObj->rowsVector->at(index + ((int)result.at(j) - 48) * tableObj->columns->size()),tableObj->rowsVector->at(index + ((int)result.at(j+1) -48) * tableObj->columns->size()),tableObj->typ->at(index),"<")){

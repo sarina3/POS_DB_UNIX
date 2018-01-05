@@ -89,8 +89,8 @@ void Client::work() {
         bzero(&buffer,255);
         cout << "co chcete poslat";
         cout << endl;
-        
         getline(cin,msg);
+        msg = "admin;" + msg;
         if(msg == "close"){
             tmp = false;
         }
