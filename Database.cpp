@@ -6,24 +6,26 @@ Database::Database()
 }
 
 bool Database::createTable(string pTableName)
-{
-	bool tmp;
-	fstream file; // nevytvori ziadny subor ak by neexistoval
-	file.open(pTableName + ".txt");
-	if (file.is_open())  //ak neexistuje neotvori sa
-	{
-		cout << "This table name already exists" << endl;
-		file.close();
-		tmp = false;
-	}
-	else {
-		ofstream file;
-		file.open(pTableName + ".txt"); //ak neexistuje vytvori  	
-		cout << "TabulkaVytvorena! \n" << endl;
-		tmp = true;
+{   
+    size_t position = pTableName.find(";");
+    pTableName.erase(0,position + 1);
+    bool tmp;
+    fstream file; // nevytvori ziadny subor ak by neexistoval
+    file.open(pTableName + ".txt");
+    if (file.is_open())  //ak neexistuje neotvori sa
+    {
+            cout << "This table name already exists" << endl;
+            file.close();
+            tmp = false;
+    }
+    else {
+            ofstream file;
+            file.open(pTableName + ".txt"); //ak neexistuje vytvori  	
+            cout << "TabulkaVytvorena! \n" << endl;
+            tmp = true;
 
-	}
-	return tmp;
+    }
+    return tmp;
 }
 
 bool Database::findTable(string pTableName)
