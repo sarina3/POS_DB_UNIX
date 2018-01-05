@@ -278,8 +278,18 @@ string Database::deleteFromTable(string command, string user) {
         command = "SELECT;*;"+table+";"+condition+";";
         ids = this->select(command,user,"function");
         for(char &j : ids){
-            //miloas
+            int index = (int)j-48;
+            for(index; index < (tableObj->rowsVector.size()/tableObj->columns->size()) - 1;index++){
+                for(int i = 0 ; i < tableObj->columns->size(); i++){
+                    tableObj->rowsVector->at(i + index*tableObj->columns->size()) = tableObj->rowsVector->at(i + (index + 1)*tableObj->columns->size());
+                }
+            }
+            for(int i = 0 ; i < tableObj->columns->size(); i++){
+                tableObj->rowsVector->pop_back();
+            }
         }
+    }else{
+        return "table with that name doesn't exist";
     }
 }
 
