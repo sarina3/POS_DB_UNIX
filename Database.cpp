@@ -52,7 +52,7 @@ bool Database::check(string user,Table* table) {
     return canManage;
 }
 
-string Database::select(string command, string user) {
+string Database::select(string command, string user,string usage) {
     string function = "";
     string selecting = "";
     string table = "";
@@ -91,7 +91,18 @@ string Database::select(string command, string user) {
     stringstream resulttmp;
     Table* tableObj = new Table(table);
     
+    
     if(tableObj->initTable()){
+        if(selecting == "*"){
+            selecting = "";
+            for(int i = 0 ; i < tableObj->columns->size();i++){
+                if(i == tableObj->columns->size() - 1){
+                    selecting += tableObj->columns->at(i);
+                    break;
+                }
+                selecting += tableObj->columns->at(i) + ",";
+            }
+        }
         if(this->check(user,tableObj)){
             if(conditions != ""){
                 vector<string> *conditionParsed = new vector<string>();
@@ -226,6 +237,9 @@ string Database::select(string command, string user) {
                     return "column name doesn't exist";
                 }
                 selecting.erase(0,position + 1);
+            }
+            if(usage == "function"){
+                return result;
             }
             string newResult = "";
             for (char& j : result){

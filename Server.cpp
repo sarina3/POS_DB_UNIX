@@ -70,7 +70,7 @@ void* server::something() {
         position = toDo.find(";");
         switch(checkInput(toDo.substr(0,position))){
             case SELECT:
-                toDo = this->database->select(toDo,user);
+                toDo = this->database->select(toDo,user,"");
                 break;
         
         }
