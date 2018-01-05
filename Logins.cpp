@@ -48,7 +48,7 @@ bool Logins::checkUserAndPass(string pUsername,string pPassword)
 	int i = 0;
 	for (string pom : *logins)
 	{
-		if (pom == pUsername && pPassword == "s") { //passwords
+		if (pom == pUsername && pPassword == (*passwords).at(i)) { //passwords
 			
 			return true;
 		}

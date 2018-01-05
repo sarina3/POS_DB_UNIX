@@ -106,7 +106,7 @@ void Client::work() {
     }
 }
 
-Client::createTable(){
+void Client::createTable(){
     string createTable = "";
     string prikaz = "";
     string odpovedServer = "";
@@ -116,6 +116,7 @@ Client::createTable(){
         cin >> prikaz;
         if(prikaz == "EXIT" || prikaz == "exit"){break;} //ked stlaci exit koncime hned
         if(prikaz != ""){
+            //POZIADANIE O ODPOVED SERVERA
             if(odpovedServer == "OK"){
                 cout << "Tabulka uspesne vytvorena! \n";
                 break;
