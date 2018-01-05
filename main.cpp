@@ -25,7 +25,7 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    /*
+    
     int tmp = 0;
     cout << "1 - server \n"
             "2 - client \n";
@@ -44,15 +44,15 @@ int main(int argc, char** argv) {
         if(cli->connection(1026) == 1){
             cli->work();
         }
-    }*/
-    
+    }
+    /*
     Database *data = new Database();
     //cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
     //data->createTable("test");
     
-    cout << data->select("SELECT;*;TabulkaVzor;;id desc","admin","");
-    
+    cout << data->deleteFromTable("DELETE;TabulkaVzor");
+    */
     return 0;
 }
 
