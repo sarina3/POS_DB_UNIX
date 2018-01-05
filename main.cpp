@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     //vytvaranie tabulky
     //data->createTable("test");
     
-    cout << data->select("SELECT;*;TabulkaVzor;","admin","");
+    cout << data->select("SELECT;*;TabulkaVzor;;id desc","admin","");
     
     return 0;
 }

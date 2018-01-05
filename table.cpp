@@ -129,14 +129,14 @@ string Table::toStringTable()
 		tmp = tmp + var + " | ";
 	}
 	tmp = tmp + "\n rows: ";
-	tmp = tmp + rows;
+	//tmp = tmp + rows;
         int pocet = 0;
         for(string var : *rowsVector){
             if(pocet == columns->size()){
                 pocet = 0;
-                tmp += "\n";
+                tmp += ";\n";
             }
-            tmp += var;
+            tmp += var+",";
             pocet++;
         }
 	return tmp;

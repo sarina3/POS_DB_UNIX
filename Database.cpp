@@ -248,12 +248,41 @@ string Database::select(string command, string user,string usage) {
                 }  
                 newResult += "\n";
             }
+            delete selectingParsed;
             return newResult;
         }else{
             return "you don't have permission to do that";
         }
     }
 }
+
+string Database::deleteFromTable(string command, string user) {
+    size_t position;
+    string function;
+    string table;
+    string condition;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        table = command.substr(0,position);
+        command.erase(0,position +1);
+        condition = command;
+    }catch(exception e){
+        return "Bad syntax";
+    }
+    string ids;
+    Table *tableObj = new Table(table);
+    if(tableObj->initTable()){
+        command = "SELECT;*;"+table+";"+condition+";";
+        ids = this->select(command,user,"function");
+        for(char &j : ids){
+            
+        }
+    }
+}
+
 
 bool Database::porovnaj(string clenzpola, string clenfixny, string typ,string operand) {
     if(typ == "double"){
