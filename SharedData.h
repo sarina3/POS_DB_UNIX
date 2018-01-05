@@ -25,9 +25,12 @@ public:
     vector<int> *activeSockets;
     vector<string> *toDo;
     vector<pthread_t*> *threads;
+    vector<string> *results;
+    pthread_mutex_t mutexResults;
     pthread_mutex_t mutexSockets;
     pthread_mutex_t mutexThreads;
     pthread_mutex_t mutexToDo;
+    pthread_cond_t  condResults;
     pthread_cond_t  condSockets;
     pthread_cond_t  condThreads;
     pthread_cond_t  condToDo;

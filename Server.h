@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <regex>
 #include <string>
+#include "Database.h"
 #include <iostream>
 #include <pthread.h>
 using namespace std;
@@ -37,7 +38,7 @@ private:
     int socketf,maxPacketSize;
     sockaddr_in  server_addr,client_addr;
     string message;
-    
+    Database *database;
     char msg[255];
     SharedData *data;
     

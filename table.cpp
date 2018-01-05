@@ -3,7 +3,7 @@
 #include <errno.h>
 
 
-Table::Table(string pTableName)
+Table::Table(string pTableName) //nevolat konstruktor, volat cez Database
 {
 	name = pTableName;
 	prava = new vector<string>();
@@ -12,6 +12,7 @@ Table::Table(string pTableName)
 	typ = new vector<string>();
 	pk = new vector<string>();
 	notNull = new vector<string>();
+        rowsVector = new vector<string>();
 }
 
 bool Table::initTable()
@@ -25,7 +26,6 @@ bool Table::initTable()
 	}
 
 	string tmp = "";
-
 	while (1)
 	{
 		getline(file, tmp, ',');
@@ -71,7 +71,16 @@ bool Table::initTable()
 	while (!file.eof())
 	{
 		getline(file, tmp, ';');
-		rows = tmp;
+		rows += tmp;
+                while(1){
+                    size_t pos = tmp.find(",");
+                    if(pos == string::npos){
+                        rowsVector->push_back(tmp);
+                        break;
+                    }
+                    rowsVector->push_back(tmp.substr(0,pos));
+                    tmp.erase(0,pos +1);
+                }
 	}
 	return true;
 }
@@ -121,7 +130,65 @@ string Table::toStringTable()
 	}
 	tmp = tmp + "\n rows: ";
 	tmp = tmp + rows;
+        int pocet = 0;
+        for(string var : *rowsVector){
+            if(pocet == columns->size()){
+                pocet = 0;
+                tmp += "\n";
+            }
+            tmp += var;
+            pocet++;
+        }
 	return tmp;
+}
+
+bool Table::writeTableToFile() //metoda sa da volat len po poriadnom vytvoreni tabulky
+{ 
+    ofstream file;
+    file.open(this->name + ".txt"); //vytvorenie suboru
+    string tmp = name + "\n prava: ";
+	for(string var : *prava)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n typPrava: ";
+	for (string var : *typPrava)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n columns: ";
+	for (string var : *columns)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n typ: ";
+	for (string var : *typ)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n PK: ";
+	for (string var : *pk)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n NN: ";
+	for (string var : *notNull)
+	{
+		tmp = tmp + var + " | ";
+	}
+	tmp = tmp + "\n rows: ";
+	tmp = tmp + rows;
+        int pocet = 0;
+        for(string var : *rowsVector){
+            if(pocet == columns->size()){
+                pocet = 0;
+                tmp += "\n";
+            }
+            tmp += var;
+            pocet++;
+        }
+	file << tmp;
+        file.close();
 }
 
 Table::~Table()
