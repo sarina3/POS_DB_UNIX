@@ -107,7 +107,7 @@ void Client::work() {
 }
 
 Client::createTable(){
-    
+    //jakub
 }
 
 Client::Client(const Client& orig) {
