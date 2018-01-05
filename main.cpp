@@ -25,7 +25,7 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    /*
+    
     int tmp = 0;
     cout << "1 - server \n"
             "2 - client \n";
@@ -54,4 +54,3 @@ int main(int argc, char** argv) {
     cout << data->update("UPDATE;TabulkaVzor;meno,priezvisko;jozko,papanek;id == 2","admin");
     return 0;
 }
-

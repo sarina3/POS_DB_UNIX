@@ -29,7 +29,7 @@
           <runcommandpicklistitem>./sempos</runcommandpicklistitem>
         </runcommandpicklist>
         <runcommand>./sempos</runcommand>
-        <rundir>/root/NetBeansProjects/semPOS</rundir>
+        <rundir>/home/rootadmin/NetBeansProjects/POS_DB_UNIX</rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>

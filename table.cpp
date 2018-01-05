@@ -146,43 +146,43 @@ bool Table::writeTableToFile() //metoda sa da volat len po poriadnom vytvoreni t
 { 
     ofstream file;
     file.open(this->name + ".txt"); //vytvorenie suboru
-    string tmp = name + "\n prava: ";
+    string tmp = name + "prava,";
 	for(string var : *prava)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n typPrava: ";
+	tmp = tmp + "typPrava,";
 	for (string var : *typPrava)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n columns: ";
+	tmp = tmp + "columns,";
 	for (string var : *columns)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n typ: ";
+	tmp = tmp + "typ,";
 	for (string var : *typ)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n PK: ";
+	tmp = tmp + "PK,";
 	for (string var : *pk)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n NN: ";
+	tmp = tmp + "NN,";
 	for (string var : *notNull)
 	{
-		tmp = tmp + var + " | ";
+		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "\n rows: ";
+	tmp = tmp + "rows,";
 	tmp = tmp + rows;
         int pocet = 0;
         for(string var : *rowsVector){
             if(pocet == columns->size()){
                 pocet = 0;
-                tmp += "\n";
+                tmp += ";";
             }
             tmp += var;
             pocet++;
