@@ -25,7 +25,7 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    
+    /*
     int tmp = 0;
     cout << "1 - server \n"
             "2 - client \n";
