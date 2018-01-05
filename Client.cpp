@@ -140,9 +140,8 @@ void Client::createTable(){
                 break;
             }
             //skuska ci je medzera
-            const char* pp = prikaz.c_str();
             
-            if( prikaz.find(",") == string::npos ){ 
+            if( prikaz.find(",") == string::npos &&  prikaz.find( " " ) == string::npos ){ 
                 createTable = createTable + prikaz + ",";              
             }else{
                 cout << "neplatny vstup\n";
