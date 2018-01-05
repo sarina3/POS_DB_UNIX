@@ -129,8 +129,9 @@ void Client::createTable(){
     int pocetUserovPrava = 0;
     bool end = false;
     while(!end){
-        cout << "zadajte prava k tabulke:\n";
+        cout << "zadajte prava k tabulke: [exit] [end]\n";
         cout << "Vsetci useri: [  ]\n"; //DOTAZ NA SERVER O VYPISANIE USEROV
+        vector<string> *pom = new vector<string>();
         for(int i = 1;;i++)
         {
             cout << "Pravo " + to_string(i) + ": ";
@@ -139,30 +140,162 @@ void Client::createTable(){
                 end = true;
                 break;
             }
-            //skuska ci je medzera
-            
-            if( prikaz.find(",") == string::npos &&  prikaz.find( " " ) == string::npos ){ 
-                createTable = createTable + prikaz + ",";              
+            if(prikaz == "end"){
+                break;
+            }
+            if(prikaz.find(",") == string::npos ){  //mozno pridat kontrolu medzerz
+                createTable = createTable + prikaz + ","; 
+                //ci existuje dany user
+                pom->push_back(prikaz);
             }else{
                 cout << "neplatny vstup\n";
                 i--;
-            }
-            
+            }  
         }
         //zadavanie typu prava
-        cout << "Prava k tabulke : [ " + prikaz + " ]\n"
-                "Pravomoci [x][w][r] oddelene + \n"
-                "Kazdy user odeleny ciarkou (aj za poslednym)\n"
-                "Vzor x+w,x+r,\n";
-        while (1) {
+        createTable = createTable + "typPrava,";
+        cout << "Prava k tabulke(x+r+w) : \n";
+        for(string ss : *pom){
+            cout << "user: [" + ss + "]: ";
             cin >> prikaz;
-            if(prikaz == "exit"){
+            if(prikaz == "exit"){ 
                 end = true;
                 break;
             }
-            
-
+            if(prikaz == "end"){
+                break;
+            }
+            if(prikaz == "x+r+w"  || prikaz == "x+r" || prikaz == "x+w" || prikaz == "x" 
+                    || prikaz == "x+w+r" || prikaz == "w+r" || prikaz == "w+x" || prikaz == "x" || 
+                    prikaz == "r+w+x" || prikaz == "r" || prikaz == "r+w" || prikaz == "x+w" )
+            {
+                createTable = createTable + prikaz + ",";
+            }
         }
+        //zadavanie columnov
+        createTable = createTable + "columns,";
+        vector<string> *stlpce = new vector<string>();
+        cout << "Zadajte stlpce: \n";
+        for(int i = 1;;i++)
+        {
+            cout << "Stlpec" + to_string(i) + ": ";
+            cin >> prikaz;
+            if(prikaz == "exit"){ 
+                end = true;
+                break;
+            }
+            if(prikaz == "end"){
+                break;
+            }
+            stlpce->push_back(prikaz);
+            createTable+=prikaz + ",";
+        }
+        //typ columnov
+        createTable+="typ,";
+        cout << "Zadajte typ stlpcov [int] [boolean] [string] [date] [double] \n";
+        for(string ss : *stlpce){
+            while(1){
+                cout << "Stlpec [" + ss + "] : ";
+                cin >> prikaz;
+                if(prikaz == "exit"){ 
+                    end = true;
+                    break;
+                }
+                if(prikaz == "end"){
+                    break;
+                }
+                if(prikaz == "string" || prikaz == "int" || prikaz == "boolean" || prikaz == "date" || prikaz == "double") //jednoducha kontrola vstupu
+                {
+                    createTable += prikaz + ","; 
+                    break;
+                }else{
+                    cout << "zly typ \n";
+                }
+            }
+        }
+        //PK
+        createTable+= "PK,";        
+        cout << "Vyberte PK [x] NO [y] YES \n";
+        string tmp = "";
+        vector<string> *pk = new vector<string>();
+        if(stlpce->size() > 0 && stlpce != nullptr){ 
+            tmp = stlpce->at(0);
+        }
+        for(string ss : *stlpce){
+            cout << "Stlpec [" + ss + "] :";
+            cin >> prikaz;
+            if(prikaz == "exit"){ 
+                end = true;
+                break;
+            }
+            if(prikaz == "end"){
+                break;
+            }
+            if(prikaz == "y")
+            {
+                pk->push_back(ss);
+                createTable+=ss + ",";
+            } 
+        }
+        //kontrola ci je vytvoreny kluc
+        if(pk->size() < 1){
+             //vytvorenie umeleho kluca cim je prvy stlpec tabulky
+            pk->push_back(tmp);
+            createTable+=tmp + ",";
+        }
+        //kontrola duplicit aby sa nezobrazovali stlpce pk
+        vector<string> *notnull = new vector<string>();
+        int jk = 0;
+        for(string gg : *stlpce){
+            for(string ss : *pk){
+                if(ss == gg){
+                    stlpce->at(jk) = "";
+                }
+            }
+            jk++;
+        }
+        //NN
+        createTable+="NN,";
+        cout << "Zadajte Not Null stlpce [x] null [y] NotNull (Stlpce PK su automaticky NN) : \n";
+        for(string ss : *stlpce){
+            if(ss != "")
+            {
+                cout << "Stlpec [" + ss + "] : ";
+                cin >> prikaz;
+                if(prikaz == "exit"){ 
+                    end = true;
+                    break;
+                }
+                if(prikaz == "end"){
+                    break;
+                }
+                if(prikaz == "y")
+                {
+                    notnull->push_back(ss);
+                }else{
+                    notnull->push_back("");
+                }
+            }
+        }
+        
+        for(string ss : *pk){
+            createTable+= ss + ",";
+        }
+        for(string ss : *notnull){
+            if(ss != ""){
+                createTable+= ss + ",";
+            }
+            
+        }
+        createTable+="rows,";
+        //zadavanie rows
+        //TODO
+        
+        //kontrola TEST
+        cout << "test\n";
+        cout << createTable;
+        end = true;
+        
 
     }
     
