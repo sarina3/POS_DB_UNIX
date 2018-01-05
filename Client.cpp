@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include "Client.h"
 #include "Server.h"
+#include "Commands.h"
 
 Client::Client(){
     port = 0;
@@ -103,6 +104,10 @@ void Client::work() {
         
         cout << msg + "\n";
     }
+}
+
+Client::createTable(){
+    
 }
 
 Client::Client(const Client& orig) {
