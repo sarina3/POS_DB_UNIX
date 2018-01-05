@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
         serv->something();
     }if(tmp == 2){
         Client *cli = new Client();
+        cli->createTable();
         //cout << "main";
         //cout << cli->connection(1027) << endl;
         //cout << "main alive \n ";

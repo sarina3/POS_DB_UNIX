@@ -126,6 +126,44 @@ void Client::createTable(){
     //tu uz je tabulka vytvorena 
     //vyskladanie stringu
     createTable = "prava,";
+    int pocetUserovPrava = 0;
+    bool end = false;
+    while(!end){
+        cout << "zadajte prava k tabulke:\n";
+        cout << "Vsetci useri: [  ]\n"; //DOTAZ NA SERVER O VYPISANIE USEROV
+        for(int i = 1;;i++)
+        {
+            cout << "Pravo " + to_string(i) + ": ";
+            cin >> prikaz;
+            if(prikaz == "exit"){ 
+                end = true;
+                break;
+            }
+            if( prikaz.find(",") == string::npos && prikaz.find("") == string::npos ){ 
+                createTable = createTable + prikaz + ",";              
+            }else{
+                cout << "neplatny vstup\n";
+                i--;
+            }
+            
+        }
+        //zadavanie typu prava
+        cout << "Prava k tabulke : [ " + prikaz + " ]\n"
+                "Pravomoci [x][w][r] oddelene + \n"
+                "Kazdy user odeleny ciarkou (aj za poslednym)\n"
+                "Vzor x+w,x+r,\n";
+        while (1) {
+            cin >> prikaz;
+            if(prikaz == "exit"){
+                end = true;
+                break;
+            }
+            
+
+        }
+
+    }
+    
 }
 
 Client::Client(const Client& orig) {
