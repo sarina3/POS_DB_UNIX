@@ -114,7 +114,8 @@ void Client::createTable(){
     {
         cout << "[VyvaranieTabulky]: Zadajte nazov tabulky alebo ukoncite [EXIT] \n";
         cin >> prikaz;
-        if(prikaz == "EXIT" || prikaz == "exit"){break;} //ked stlaci exit koncime hned
+        if(prikaz == "EXIT" || prikaz == "exit"){return;} //ked stlaci exit koncime hned
+        if(prikaz == "end"){break;} //len na testovanie
         if(prikaz != ""){
             //POZIADANIE O ODPOVED SERVERA
             if(odpovedServer == "OK"){
@@ -128,6 +129,8 @@ void Client::createTable(){
     createTable = "prava,";
     int pocetUserovPrava = 0;
     bool end = false;
+    vector<string> *stlpce2 = new vector<string>();
+    vector<string> *typColumn = new vector<string>();
     while(!end){
         cout << "zadajte prava k tabulke: [exit] [end]\n";
         cout << "Vsetci useri: [  ]\n"; //DOTAZ NA SERVER O VYPISANIE USEROV
@@ -155,22 +158,29 @@ void Client::createTable(){
         //zadavanie typu prava
         createTable = createTable + "typPrava,";
         cout << "Prava k tabulke(x+r+w) : \n";
+        bool knt = false;
         for(string ss : *pom){
             cout << "user: [" + ss + "]: ";
-            cin >> prikaz;
-            if(prikaz == "exit"){ 
-                end = true;
-                break;
+            while(!knt){
+                cin >> prikaz;
+                if(prikaz == "exit"){ 
+                    end = true;
+                    break;
+                }
+                if(prikaz == "end"){
+                    break;
+                }
+                if(prikaz == "x+r+w"  || prikaz == "x+r" || prikaz == "x+w" || prikaz == "x" 
+                        || prikaz == "x+w+r" || prikaz == "w+r" || prikaz == "w+x" || prikaz == "x" || 
+                        prikaz == "r+w+x" || prikaz == "r" || prikaz == "r+w" || prikaz == "x+w" )
+                {
+                    knt = true;
+                    createTable = createTable + prikaz + ",";
+                }else{
+                    cout << "zadajte prava este raz \n";
+                }
             }
-            if(prikaz == "end"){
-                break;
-            }
-            if(prikaz == "x+r+w"  || prikaz == "x+r" || prikaz == "x+w" || prikaz == "x" 
-                    || prikaz == "x+w+r" || prikaz == "w+r" || prikaz == "w+x" || prikaz == "x" || 
-                    prikaz == "r+w+x" || prikaz == "r" || prikaz == "r+w" || prikaz == "x+w" )
-            {
-                createTable = createTable + prikaz + ",";
-            }
+            
         }
         //zadavanie columnov
         createTable = createTable + "columns,";
@@ -207,6 +217,7 @@ void Client::createTable(){
                 if(prikaz == "string" || prikaz == "int" || prikaz == "boolean" || prikaz == "date" || prikaz == "double") //jednoducha kontrola vstupu
                 {
                     createTable += prikaz + ","; 
+                    typColumn->push_back(prikaz);
                     break;
                 }else{
                     cout << "zly typ \n";
@@ -245,8 +256,11 @@ void Client::createTable(){
         }
         //kontrola duplicit aby sa nezobrazovali stlpce pk
         vector<string> *notnull = new vector<string>();
+        
+        
         int jk = 0;
         for(string gg : *stlpce){
+            stlpce2->push_back(gg);
             for(string ss : *pk){
                 if(ss == gg){
                     stlpce->at(jk) = "";
@@ -289,7 +303,49 @@ void Client::createTable(){
         }
         createTable+="rows,";
         //zadavanie rows
-        //TODO
+        //tu uz je hotova tabulka
+        end = true;
+    }
+    end = false;
+    if(stlpce2->size() > 0) // iba ak user neukoncil program skorej
+    {
+        cout << "Vlozte riadky do tabulky: [exit] [end] \n";
+        vector<string> *rows = new vector<string>();
+        int i = 0;
+        bool kontrola = false;
+        while(!end){
+            for(string gg : *stlpce2){
+                while(!kontrola){
+                    cout << "[ " + gg + " ]: ";
+                    cin >> prikaz;
+                    if(prikaz == "exit"){ 
+                        end = true;
+                        break;
+                    }
+                    if(prikaz == "end"){
+                        break;
+                    }
+                    if(checkTypesOfColums(typColumn->at(i),prikaz)){
+                        cout << prikaz;
+                        rows->push_back(prikaz);
+                        kontrola = true;
+                        
+                    }
+                }
+                kontrola = false;
+                i++;  
+            }
+            cout << "\n riadok uspesne zadany! \n";
+            i = i % stlpce2->size(); //aby bola kontrola typov od zaciatku
+            
+        }
+        
+    }
+    
+       
+        
+        
+        
         
         //kontrola TEST
         cout << "test\n";
@@ -297,8 +353,34 @@ void Client::createTable(){
         end = true;
         
 
-    }
     
+    
+}
+
+bool Client::checkTypesOfColums(string typ, string prikaz){
+    try
+    {
+        //STRING netreba kontrolovat ten je ok
+        if(typ == "int"){int ss = stoi(prikaz);} 
+        if(typ == "double"){double ss = stod(prikaz);} 
+        if(typ == "boolean" && (prikaz == "true" || prikaz == "false")){return true;}
+        if(typ == "date"){
+            int den = stoi(prikaz.substr(0,2));
+            den = stoi(prikaz.substr(3,2));
+            int rok = stoi(prikaz.substr(6,4));
+            if(rok > 2020 || rok < 0){ //rok pana >D
+                return false;
+            }
+
+        } 
+    }
+    catch(exception e)
+    {
+        cout << "zly vstup\n";
+        return false;
+    }
+        
+    return true;
 }
 
 Client::Client(const Client& orig) {

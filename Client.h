@@ -37,6 +37,7 @@ private:
     int socketf,port;
     sockaddr_in server;
     string adress;
+    bool checkTypesOfColums(string typ, string prikaz);
 };
 
 #endif /* CLIENT_H */
