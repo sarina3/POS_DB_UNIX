@@ -311,11 +311,13 @@ void Client::createTable(){
         end = true;
     }
     end = false;
+
     int zhoda = 0;
+    vector<string> *rows = new vector<string>();
     if(stlpce2->size() > 0) // iba ak user neukoncil program skorej
     {
         cout << "Vlozte riadky do tabulky: [exit] [end] \n";
-        vector<string> *rows = new vector<string>();
+       
         int i = 0;
         int tt = 0;
         bool kontrola = false;
@@ -324,11 +326,8 @@ void Client::createTable(){
                 while(!kontrola){
                     cout << "[ " + gg + " ]: ";
                     cin >> prikaz;
-                    if(prikaz == "exit"){ 
+                    if(prikaz == "exit" || prikaz == "end"){ 
                         end = true;
-                        break;
-                    }
-                    if(prikaz == "end"){
                         break;
                     }
                     if(prikaz == "null"){  //kontrola notnull aj ci PK nie je null
@@ -366,6 +365,9 @@ void Client::createTable(){
                     zhoda = 0;
                    
                 }
+                if(end){
+                    break;
+                }
                 kontrola = false;
                 i++;  
             }
@@ -379,13 +381,21 @@ void Client::createTable(){
        
         
         
-        
-        
-        //kontrola TEST
-        cout << "test\n";
-        cout << createTable;
-        end = true;
-        
+    int r = 0;
+    for(string ss : *rows){
+        if(r==stlpce2->size()-1){
+            r = -1;
+            createTable+=ss+";";
+        }else{
+            createTable+=ss+",";
+        }
+        r++;
+    }
+    //kontrola TEST
+    cout << "test\n";
+    cout << createTable;
+    end = true;
+
 
     
     
