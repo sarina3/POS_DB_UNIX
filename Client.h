@@ -33,11 +33,13 @@ public:
     Client(const Client& orig);
     string login();
     virtual ~Client();
+   
 private:
     int socketf,port;
     sockaddr_in server;
     string adress;
     bool checkTypesOfColums(string typ, string prikaz);
+    bool checDuplicatesOfPKandNotNullRows(string vstup);
 };
 
 #endif /* CLIENT_H */

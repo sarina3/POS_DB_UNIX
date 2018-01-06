@@ -21,6 +21,7 @@ Client::Client(){
     port = 0;
     socketf = -1;
     adress = "";
+
 }
 
 int Client::connection(int portNumber) {
@@ -131,6 +132,8 @@ void Client::createTable(){
     bool end = false;
     vector<string> *stlpce2 = new vector<string>();
     vector<string> *typColumn = new vector<string>();
+    vector<string> *notnull = new vector<string>();
+    vector<string> *pk = new vector<string>();
     while(!end){
         cout << "zadajte prava k tabulke: [exit] [end]\n";
         cout << "Vsetci useri: [  ]\n"; //DOTAZ NA SERVER O VYPISANIE USEROV
@@ -228,7 +231,7 @@ void Client::createTable(){
         createTable+= "PK,";        
         cout << "Vyberte PK [x] NO [y] YES \n";
         string tmp = "";
-        vector<string> *pk = new vector<string>();
+
         if(stlpce->size() > 0 && stlpce != nullptr){ 
             tmp = stlpce->at(0);
         }
@@ -255,7 +258,7 @@ void Client::createTable(){
             createTable+=tmp + ",";
         }
         //kontrola duplicit aby sa nezobrazovali stlpce pk
-        vector<string> *notnull = new vector<string>();
+       
         
         
         int jk = 0;
@@ -293,6 +296,7 @@ void Client::createTable(){
         }
         
         for(string ss : *pk){
+            notnull->push_back(ss);
             createTable+= ss + ",";
         }
         for(string ss : *notnull){
@@ -307,11 +311,13 @@ void Client::createTable(){
         end = true;
     }
     end = false;
+    int zhoda = 0;
     if(stlpce2->size() > 0) // iba ak user neukoncil program skorej
     {
         cout << "Vlozte riadky do tabulky: [exit] [end] \n";
         vector<string> *rows = new vector<string>();
         int i = 0;
+        int tt = 0;
         bool kontrola = false;
         while(!end){
             for(string gg : *stlpce2){
@@ -325,12 +331,40 @@ void Client::createTable(){
                     if(prikaz == "end"){
                         break;
                     }
+                    if(prikaz == "null"){  //kontrola notnull aj ci PK nie je null
+                        for(string ss : *notnull){
+                            if(ss == gg){
+                                prikaz = "nemoze";
+                            }
+                        }
+                    }
                     if(checkTypesOfColums(typColumn->at(i),prikaz)){
-                        cout << prikaz;
-                        rows->push_back(prikaz);
-                        kontrola = true;
+                        
+                        for(string kk : *pk){
+                            if(kk == gg){
+                                for(int gg = tt; gg < rows->size();gg+=stlpce2->size()){
+                                    if(rows->at(gg) == prikaz)
+                                    {
+                                        zhoda++;
+                                    };
+                                }
+                            
+                        }
+                         tt++;   
+                        
                         
                     }
+                        tt=0;
+                        if(zhoda < 1){
+                             cout << prikaz;
+                             rows->push_back(prikaz);
+                             kontrola = true;
+                        }else{
+                            cout << "DUplicita PK \n";
+                        }
+                        }
+                    zhoda = 0;
+                   
                 }
                 kontrola = false;
                 i++;  
@@ -358,6 +392,14 @@ void Client::createTable(){
 }
 
 bool Client::checkTypesOfColums(string typ, string prikaz){
+    if(prikaz == "nemoze"){
+        cout << "zly vstup \n";
+        return false;
+    }
+    if(prikaz == "null"){
+        return true;
+    }
+    
     try
     {
         //STRING netreba kontrolovat ten je ok
@@ -380,6 +422,11 @@ bool Client::checkTypesOfColums(string typ, string prikaz){
         return false;
     }
         
+    return true;
+}
+
+bool Client::checDuplicatesOfPKandNotNullRows(string vstup){
+    
     return true;
 }
 
