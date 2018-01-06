@@ -251,6 +251,7 @@ string Database::select(string command, string user,string usage) {
                 newResult += "\n";
             }
             delete selectingParsed;
+            delete tableObj;
             return newResult;
         }else{
             return "you don't have permission to do that";
@@ -297,6 +298,7 @@ string Database::deleteFromTable(string command, string user) {
         }else{
             return "something went wrong";
         }*/
+        delete tableObj;
         return "preslo";
         }else{
             return "you don't have permission to do that";
@@ -374,6 +376,9 @@ string Database::update(string command, string user) {
                         tableObj->rowsVector->at(colmunsParsed->at(i) + ((int)j -48)*tableObj->columns->size()) = valuesParsed->at(i);
                     }
                 }
+                delete colmunsParsed;
+                delete valuesParsed;
+                delete tableObj;
                 return indexes.size() + "columns was updated successfully";
             }else{
                 return "number of columns and number of values to update don't match";
@@ -381,6 +386,127 @@ string Database::update(string command, string user) {
         }
     }
 }
+//INSERT;table;columns;values
+string Database::insert(string command, string user) {
+    string function;
+    string table;
+    string columns;
+    string values;
+    size_t position;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position+1);
+        position = command.find(";");
+        table = command.substr(0,position);
+        command.erase(0,position+1);
+        position = command.find(";");
+        columns = command.substr(0,position);
+        command.erase(0,position+1);
+        values = command;
+    }catch(exception e){
+        return "Bad syntax";
+    }
+    Table* tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,tableObj)){
+            vector<string> *columnsParsed = new vector<string>();
+            while(1){
+                position = columns.find(",");
+                if(position == string::npos){
+                    columnsParsed->push_back(columns);
+                    break;
+                }
+                columnsParsed->push_back(columns.substr(0,position));
+                columns.erase(0,position +1);
+            }
+            int counter =0;
+            int counterNN =0; 
+            for(int i = 0 ; i < tableObj->notNull->size();i++){
+                if(tableObj->notNull->at(i) != "x"){
+                    counterNN++;
+                }
+                for(string tmp : *columnsParsed){
+                    if(tableObj->notNull->at(i) == tmp){
+                        counter ++;
+                    }
+                }
+            }
+            
+            if(counter != counterNN){
+                return "not all Not Null columns filled";
+            }
+            vector<string> *valuesParsed = new vector<string>();
+            while(1){
+                position = values.find(",");
+                if(position == string::npos){
+                    valuesParsed->push_back(values);
+                    break;
+                }
+                valuesParsed->push_back(values.substr(0,position));
+                values.erase(0,position +1);
+            }
+            vector<int> *columnsID = new vector<int>();
+            for(string iterator : *columnsParsed){
+                for(int i = 0 ; i < tableObj->columns->size();i++){
+                    if(iterator == tableObj->columns->at(i)){
+                        columnsID->push_back(i);
+                    }
+                }
+            }
+            for(int i = 0 ; i < columnsID->size();i++){
+                for(int j = 0 ; j < columnsID->size()-i-1;j++){
+                    if(columnsID->at(j) > columnsID->at(j+1)){
+                        int tmp = columnsID->at(j);
+                        columnsID->at(j) = columnsID->at(j+1);
+                        columnsID->at(j+1) = tmp;
+                        string tmp1 = valuesParsed->at(j);
+                        valuesParsed->at(j) = valuesParsed->at(j+1);
+                        valuesParsed->at(j+1) = tmp1;
+                    }
+                }
+            }
+            bool tmp;
+            columnsParsed->clear();
+            for(int i = 0 ; i < tableObj->columns->size();i++){
+                tmp = false;
+                for(int j = 0 ; j < columnsID->size();j++){
+                   if(i == columnsID->at(j)){
+                        columnsParsed->push_back(valuesParsed->at(j));
+                        tmp = true;
+                        break;
+                    }
+                }
+                if(!tmp){
+                    columnsParsed->push_back("");
+                }
+            }
+            cout << endl;
+            for(int i = 0; i < columnsParsed->size() ; i++){
+                tableObj->rowsVector->push_back(columnsParsed->at(i));
+                //cout << i << columnsParsed->at(i);
+            }
+            stringstream pom;
+            for(int i = 0 ; i < tableObj->rowsVector->size();i++){
+                if(tableObj->rowsVector->at(i) == ""){
+                    pom << "|";
+                }else{
+                    pom << tableObj->rowsVector->at(i);
+                }
+            }
+            cout << pom.str();
+            delete columnsParsed;
+            delete columnsID;
+            delete valuesParsed;
+            delete tableObj;
+            return "row was inserted successfully";
+        }else{
+            return "you dont have permission to do that";
+         }
+    }else{
+        return "table you want to insert into does not exist";
+    }
+}   
 
 
 bool Database::porovnaj(string clenzpola, string clenfixny, string typ,string operand) {
