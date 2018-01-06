@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
         serv->something();
     }if(tmp == 2){
         Client *cli = new Client();
-        cli->createTable(); //MIlos testovanie 
+        //cli->createTable(); //MIlos testovanie 
         //cout << "main";
         //cout << cli->connection(1027) << endl;
         //cout << "main alive \n ";
@@ -46,13 +46,14 @@ int main(int argc, char** argv) {
             cli->work();
         }
     }
+    
     /*
     Database *data = new Database();
     //cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
     //data->createTable("test");
     
-    cout << data->select("SELECT;*;TabulkaVzor;;id desc","admin","");
+    cout << data->select("SELECT;*;TabulkaVzor;;","admin","");
     */
     return 0;
 }

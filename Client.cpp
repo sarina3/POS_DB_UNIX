@@ -72,40 +72,95 @@ string Client::login() {
     string tmp;
     cout << "Log in Foltan&Sarina&Ivanic's database:\nUsername:\n";
     cin >> tmp;
+    this->username = tmp;
     str.append(tmp + ";");
     cout << "password:\n";
     cin >> tmp;
     str.append(tmp);
     return str;
 }
-
+string Client::sendMessage(string message){
+    char buffer[255];
+    bzero(&buffer,255);
+    message = this->username + ";" + message;
+    send(socketf,message.c_str(),255,0);
+    recv(socketf,&buffer,255,0);
+    message = buffer;
+    return message;
+} 
 
 void Client::work() {
     bool tmp = true;
     string msg = "";
     //cout << "im here" << endl;
-    char buffer[255];
     //bzero(&buffer,255);
     getline(cin,msg);
     while(tmp == true){
-        bzero(&buffer,255);
         cout << "co chcete poslat";
         cout << endl;
         getline(cin,msg);
-        msg = "admin;" + msg;
-        if(msg == "close"){
-            tmp = false;
+        switch(checkInput(msg)){
+            case SELECT:
+                msg = this->select();
+                msg = this->sendMessage(msg);
+                break;
+            case INSERT:
+                msg = this->insert();
+                msg = this->sendMessage(msg);
+                break;
+            case UPDATE:
+                msg = this->update();
+                msg = this->sendMessage(msg);
+                break;
+            case DELETE:
+                msg = this->deleteFromTable();
+                msg = this->sendMessage(msg);
+                break;
+            default:
+                msg = "zly  prikaz";
+                break;
         }
-        send(socketf,msg.c_str(),255,0);
-        recv(socketf,&buffer,255,0);
-        if(buffer == "close"){
-            break;
-        }
-        msg = buffer;
-        
-        cout << msg + "\n";
+        cout << msg;
     }
 }
+
+string Client::select() {
+    string message = "SELECT;";
+    string tmp;
+    cout << "zadajte co chcete vybrat z tabulky ako oddelovac pouzite , (napr. id,meno):"<<endl;
+    getline(cin,tmp);
+    message += tmp + ";";
+    cout << "zadajte nazov tabulky z ktorej chcete vyberat:"<<endl;
+    getline(cin,tmp);
+    message += tmp + ";";
+    cout << "zadajte podmienky podla ktorych chcete vyberat (nemusite vyplnit, napr.: id == 1):"<<endl;
+    getline(cin,tmp);
+    if(tmp != ""){
+        message += tmp + ";";
+    }else{
+        message += ";";
+    }
+    cout << "zadajte stlpec podla ktoreho chcete zoradit vysledky (napr.: id asc):"<<endl;
+    getline(cin,tmp);
+    if(tmp != ""){
+        message += tmp;
+    }
+    cout << message;
+    return message;
+}
+
+string Client::insert() {
+
+}
+
+string Client::update() {
+
+}
+
+string Client::deleteFromTable() {
+
+}
+
 
 void Client::createTable(){
     string createTable = "";
