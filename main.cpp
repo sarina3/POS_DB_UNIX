@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
     //cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
     //data->createTable("test");
-    
-    cout << data->update("UPDATE;TabulkaVzor;meno,priezvisko;jozko,papanek;id == 2","admin");
+    cout << data->insert("insert;TabulkaVzor;meno,id,priezvisko;jozko,6,papanek","admin");
     return 0;
 }
