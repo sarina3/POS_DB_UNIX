@@ -173,7 +173,7 @@ void Client::createTable(){
         if(prikaz == "EXIT" || prikaz == "exit"){return;} //ked stlaci exit koncime hned
         if(prikaz == "end"){break;} //len na testovanie
         if(prikaz != ""){
-            //POZIADANIE O ODPOVED SERVERA
+           // sendMessage(prikaz); // odpoved ci existuje tabulka
             if(odpovedServer == "OK"){
                 cout << "Tabulka uspesne vytvorena! \n";
                 break;
@@ -447,8 +447,10 @@ void Client::createTable(){
         r++;
     }
     //kontrola TEST
-    cout << "test\n";
-    cout << createTable;
+    //cout << "test\n";
+    //cout << createTable;
+    
+    //ODOSLANIE NA SERVER TABULKy
     end = true;
 
 
