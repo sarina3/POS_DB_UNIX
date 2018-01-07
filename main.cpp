@@ -47,13 +47,15 @@ int main(int argc, char** argv) {
         }
         delete cli;
     }
+     
     /*
     Database *data = new Database();
     //cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
     //data->createTable("test");
-    cout << data->select("SELECT;;;;","admin","");
+    cout << data->deleteFromTable("DELETE;TabulkaVzor;meno == Jakub","admin");
     return 0;
-     */
+    */
+     
     
 }

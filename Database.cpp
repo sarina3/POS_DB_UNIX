@@ -286,6 +286,7 @@ string Database::deleteFromTable(string command, string user) {
         ids = this->select(command,user,"function");
             for(char &j : ids){
                 int index = (int)j-48;
+                cout << index << endl;
                 for(index; index < (tableObj->rowsVector->size()/tableObj->columns->size()) - 1;index++){
                     for(int i = 0 ; i < tableObj->columns->size(); i++){
                         tableObj->rowsVector->at(i + index*tableObj->columns->size()) = tableObj->rowsVector->at(i + (index + 1)*tableObj->columns->size());
@@ -296,12 +297,11 @@ string Database::deleteFromTable(string command, string user) {
                     tableObj->rowsVector->pop_back();
                 }
             }
-        /*if(tableObj->writeTableToFile()){
+        if(tableObj->writeTableToFile()){
            return ids.size() + " rows was successfully deleted";
         }else{
             return "something went wrong";
-        }*/
-        cout << tableObj->toStringTable();
+        }
         delete tableObj;
         return "rows was successfully deleted";
         }else{
@@ -380,7 +380,7 @@ string Database::update(string command, string user) {
                         tableObj->rowsVector->at(colmunsParsed->at(i) + ((int)j -48)*tableObj->columns->size()) = valuesParsed->at(i);
                     }
                 }
-                cout << tableObj->toStringTable();
+                tableObj->writeTableToFile();
                 delete colmunsParsed;
                 delete valuesParsed;
                 delete tableObj;
@@ -500,6 +500,7 @@ string Database::insert(string command, string user) {
                 }
             }
             cout << pom.str();
+            tableObj->writeTableToFile();
             delete columnsParsed;
             delete columnsID;
             delete valuesParsed;

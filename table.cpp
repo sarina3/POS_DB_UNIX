@@ -71,10 +71,22 @@ bool Table::initTable()
 	while (!file.eof())
 	{
 		getline(file, tmp, ';');
+                
 		rows += tmp;
                 while(1){
-                    size_t pos = tmp.find(",");
+                    size_t pos = 0;
+                    while(pos < tmp.length()){
+                        pos = tmp.find("\n");
+                        if(pos == string::npos){
+                            break;
+                        }
+                        tmp.erase(pos,1);
+                    }
+                     pos = tmp.find(",");
                     if(pos == string::npos){
+                        if(tmp == ""){
+                            break;
+                        }
                         rowsVector->push_back(tmp);
                         break;
                     }
@@ -146,7 +158,7 @@ bool Table::writeTableToFile() //metoda sa da volat len po poriadnom vytvoreni t
 { 
     ofstream file;
     file.open(this->name + ".txt"); //vytvorenie suboru
-    string tmp = name + "prava,";
+    string tmp = "prava,";
 	for(string var : *prava)
 	{
 		tmp = tmp + var + ",";
@@ -176,16 +188,16 @@ bool Table::writeTableToFile() //metoda sa da volat len po poriadnom vytvoreni t
 	{
 		tmp = tmp + var + ",";
 	}
-	tmp = tmp + "rows,";
-	tmp = tmp + rows;
+	tmp = tmp + "rows,\n";
         int pocet = 0;
         for(string var : *rowsVector){
-            if(pocet == columns->size()){
+            if(pocet == columns->size() -1){
                 pocet = 0;
-                tmp += ";";
+                tmp +=  var +";\n";
+            }else{
+                tmp += var + ",";
+                pocet++;
             }
-            tmp += var;
-            pocet++;
         }
 	file << tmp;
         file.close();

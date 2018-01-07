@@ -9,8 +9,10 @@
         <group>
             <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/Client.h</file>
             <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/Client.cpp</file>
+            <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/Database.h</file>
             <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/Database.cpp</file>
             <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/main.cpp</file>
+            <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/table.cpp</file>
             <file>file:/root/NetBeansProjects/semPOSlatestLatest/semPOS/Server.cpp</file>
         </group>
     </open-files>
