@@ -43,14 +43,20 @@ void* server::something() {
     size_t position;
     string user;
     int socketNum;
+    bool noReturn;
     while(1){
+        toDo = "";
+        noReturn = false;
         pthread_mutex_lock(&this->data->mutexToDo);
+        
         if(this->data->toDo->size() == 0){
             //cout << "cakam" << endl;
             pthread_cond_wait(&this->data->condToDo,&this->data->mutexToDo);
         }
         toDo = this->data->toDo->at(0);
+        //cout << this->data->toDo->size();
         for(int i = 0 ; i < this->data->toDo->size() ; i++){
+           // cout << this->data->toDo->at(i);
             if(i != this->data->toDo->size() - 1 ){
                 this->data->toDo->at(i) = data->toDo->at( i+1);
             }else{
@@ -58,10 +64,10 @@ void* server::something() {
             }
         }
         pthread_mutex_unlock(&this->data->mutexToDo);
-        cout << toDo << endl;
+        //cout << toDo << endl;
         position = toDo.find(";");
         socketNum = stoi(toDo.substr(0,position));
-        cout << socketNum << endl;
+        //cout << socketNum << endl;
         toDo = toDo.erase(0,position + 1);
         position = 0;
         position = toDo.find(";");
@@ -69,6 +75,7 @@ void* server::something() {
         toDo.erase(0,position+1);
         position = 0;
         position = toDo.find(";");
+        //cout << toDo << endl;
         switch(checkInput(toDo.substr(0,position))){
             case SELECT:
                 toDo = this->database->select(toDo,user,"");
@@ -76,9 +83,25 @@ void* server::something() {
             case CreateTable:
                 toDo = this->database->createTable(toDo); //navratova hodnota pre klienta,
                 break;
-        
+            case INSERT:
+                toDo = this->database->insert(toDo,user);
+                break;
+            case myClose:
+                this->Myclose(socketNum);
+                noReturn = true;
+                break;
+            case UPDATE:
+                toDo = this->database->update(toDo,user);
+                break;
+            case DELETE:
+                toDo = this->database->deleteFromTable(toDo,user);
+                break;
+            default:
+                toDo = "command you have entered does not exist";
+                break;
         }
         // sem pride bud switch alebo daco ine co bude volat funkcie  podla prikazu v Stringu
+        if(!noReturn){
         stringstream str;
         str << socketNum << ";";
         toDo = str.str() + toDo;
@@ -86,7 +109,34 @@ void* server::something() {
         this->data->results->push_back(toDo);
         pthread_cond_broadcast(&this->data->condResults);
         pthread_mutex_unlock(&this->data->mutexResults);
+        }
     }
+}
+void server::Myclose(int socketnum) {
+    pthread_mutex_lock(&this->data->mutexSockets);
+    int index;
+    for(int i = 0 ; i < data->activeSockets->size() ;i++){
+        if(socketnum == data->activeSockets->at(i)){
+            index = i;
+        }
+    }
+    for(int i = index ; index < data->activeSockets->size() -1 ; i++){
+        data->activeSockets->at(i) = data->activeSockets->at(i+1);
+    }
+    data->activeSockets->pop_back();    
+    //pthread_t *tmp;
+    pthread_mutex_unlock(&data->mutexSockets);
+    pthread_mutex_lock(&data->mutexThreads);
+    //tmp = data->threads->at(index);
+    //pthread_cancel(*tmp);
+    for(int i = index ; i < data->threads->size() -1 ;i++){
+        data->threads->at(i) = data->threads->at(i+1);
+    }
+    data->threads->pop_back();
+    pthread_mutex_unlock(&data->mutexThreads);
+    //delete tmp;
+    close(socketnum);
+    cout << "conection with number" << socketnum << "was closed successfully" << endl;
 }
 
 void* server::listening(void* pdata){
@@ -150,24 +200,34 @@ void* server::work(void* pdata){
     string message;
     int maxPacketSize = 255;
     int socketf;
+    pthread_mutex_lock(&data->mutexSockets);
     if(data ->activeSockets->size() > 0){
-        pthread_mutex_lock(&data->mutexSockets);
+        
         socketf = data->activeSockets->at(data->activeSockets->size() - 1);
         pthread_mutex_unlock(&data->mutexSockets);
     }else{
+        pthread_mutex_unlock(&data->mutexSockets);
         return 0;
     }
 
     char msg[255];
     int n = 0;  
+    size_t position;
+    bool close = false;
     while(1){
+        message = "" ;
         n = recv(socketf,msg,maxPacketSize,0);
         message = msg;
+        position = message.find(";");
+        message.erase(0,position+1);
+        cout << message << endl;
         if(message == "close"){
+            cout << "som tu" << endl;
             message = "closing connection";
             send(socketf,message.c_str(),maxPacketSize,0);
-            break;
+            close = true;
         }
+        message = msg;
         stringstream str;
         str << socketf << ";";
         message = str.str() + message;
@@ -175,6 +235,9 @@ void* server::work(void* pdata){
         data->toDo->push_back(message);
         pthread_cond_signal(&data->condToDo);
         pthread_mutex_unlock(&data->mutexToDo);
+        if(close){
+            break;
+        }
         pthread_mutex_lock(&data->mutexResults);
         if(data->results->size() >= 0){
             
@@ -202,8 +265,10 @@ void* server::work(void* pdata){
         send(socketf,message.c_str(),maxPacketSize,0);
         
     }
+    cout << "koncim" << endl;
     data = NULL;
-    pthread_exit(NULL);
+    pthread_cancel(pthread_self());
+    
 }
 
 

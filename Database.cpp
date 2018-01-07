@@ -89,6 +89,9 @@ string Database::select(string command, string user,string usage) {
     }catch(exception e){
 
     }
+    if(selecting == "" || table == "" ){
+        return "Bad syntax";
+    }
     string result ="";
     stringstream resulttmp;
     Table* tableObj = new Table(table);
@@ -258,7 +261,7 @@ string Database::select(string command, string user,string usage) {
         }
     }
 }
-
+//DELETE;Table;conditions
 string Database::deleteFromTable(string command, string user) {
     size_t position;
     string function;
@@ -298,8 +301,9 @@ string Database::deleteFromTable(string command, string user) {
         }else{
             return "something went wrong";
         }*/
+        cout << tableObj->toStringTable();
         delete tableObj;
-        return "preslo";
+        return "rows was successfully deleted";
         }else{
             return "you don't have permission to do that";
         }
@@ -376,10 +380,11 @@ string Database::update(string command, string user) {
                         tableObj->rowsVector->at(colmunsParsed->at(i) + ((int)j -48)*tableObj->columns->size()) = valuesParsed->at(i);
                     }
                 }
+                cout << tableObj->toStringTable();
                 delete colmunsParsed;
                 delete valuesParsed;
                 delete tableObj;
-                return indexes.size() + "columns was updated successfully";
+                return "columns was updated successfully";
             }else{
                 return "number of columns and number of values to update don't match";
             }

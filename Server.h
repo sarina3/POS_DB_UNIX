@@ -32,6 +32,7 @@ public:
     server(const server& orig);
     static void* work(void* pdata);
     static void* listening(void* pdata);
+    void Myclose(int socketnum);
     void* something();
     virtual ~server();
 private:

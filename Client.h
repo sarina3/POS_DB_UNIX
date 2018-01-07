@@ -29,13 +29,21 @@ public:
     Client();
     int connection(int portNumber);
     void work();
+    string sendMessage(string message);
     void createTable();
     Client(const Client& orig);
     string login();
+    string select();
+    string insert();
+    string update();
+    string deleteFromTable();
+    bool checkTypesOfColums(string typ, string prikaz);
+    bool checDuplicatesOfPKandNotNullRows(string vstup);
     virtual ~Client();
 private:
     int socketf,port;
     sockaddr_in server;
+    string username;
     string adress;
 };
 
