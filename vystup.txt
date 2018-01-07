@@ -1,0 +1,4 @@
+TabulkaVzor.txt
+test.txt
+vystup.txt
+zskuska.txt

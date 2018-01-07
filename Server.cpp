@@ -96,6 +96,12 @@ void* server::something() {
             case DELETE:
                 toDo = this->database->deleteFromTable(toDo,user);
                 break;
+            case DropTable:
+                toDo = this->database->dropTable(toDo,user);
+                break;
+            case getTables:
+                toDo = this->database->getAllTables(toDo);
+                break;
             default:
                 toDo = "command you have entered does not exist";
                 break;

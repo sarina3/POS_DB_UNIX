@@ -36,6 +36,8 @@ public:
     string select();
     string insert();
     string update();
+    string dropTable();
+    string getTablesAll();
     string deleteFromTable();
     bool checkTypesOfColums(string typ, string prikaz);
     bool checDuplicatesOfPKandNotNullRows(string vstup);

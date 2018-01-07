@@ -43,12 +43,30 @@ bool Database::findTable(string pTableName)
 	}
 }
 
-bool Database::check(string user,Table* table) {
+bool Database::check(string user,Table* table,bool owner) {
     bool canManage = false;
-    for(int i = 0 ; i < table->prava->size() ; i++){
-        if(user == table->prava->at(i)){
-            canManage = true;
-            break;
+    if(owner == false){
+        for(int i = 0 ; i < table->prava->size() ; i++){
+            if(user == table->prava->at(i)){
+                canManage = true;
+                break;
+            }
+        }
+    }else{
+        if(table->prava->size() >=2){
+            for(int i = 0 ; i < 2 ; i++){
+                if(user == table->prava->at(i)){
+                    canManage = true;
+                    break;
+                }
+            }
+        }else{
+            for(int i = 0 ; i < table->prava->size() ; i++){
+                if(user == table->prava->at(i)){
+                    canManage = true;
+                    break;
+                }
+            }
         }
     }
     return canManage;
@@ -108,7 +126,7 @@ string Database::select(string command, string user,string usage) {
                 selecting += tableObj->columns->at(i) + ",";
             }
         }
-        if(this->check(user,tableObj)){
+        if(this->check(user,tableObj,false)){
             if(conditions != ""){
                 vector<string> *conditionParsed = new vector<string>();
                 while(1){
@@ -281,7 +299,7 @@ string Database::deleteFromTable(string command, string user) {
     string ids;
     Table *tableObj = new Table(table);
     if(tableObj->initTable()){
-        if(check(user,tableObj)){
+        if(check(user,tableObj,false)){
         command = "SELECT;*;"+table+";"+condition+";";
         ids = this->select(command,user,"function");
             for(char &j : ids){
@@ -338,7 +356,7 @@ string Database::update(string command, string user) {
     }
     Table *tableObj = new Table(table);
     if(tableObj->initTable()){
-        if(this->check(user,tableObj)){
+        if(this->check(user,tableObj,false)){
             command = "SELECT;*;" + table + ";"+conditions+";";
             string indexes = this->select(command,user,"function");
             vector<int> *colmunsParsed = new vector<int>();
@@ -414,7 +432,7 @@ string Database::insert(string command, string user) {
     }
     Table* tableObj = new Table(table);
     if(tableObj->initTable()){
-        if(this->check(user,tableObj)){
+        if(this->check(user,tableObj,false)){
             vector<string> *columnsParsed = new vector<string>();
             while(1){
                 position = columns.find(",");
@@ -600,6 +618,41 @@ bool Database::porovnaj(string clenzpola, string clenfixny, string typ,string op
     return false;
 }
 
+string Database::dropTable(string command, string user) {
+    string function;
+    string table;
+    size_t position;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        if(position == string::npos){
+            table = command;
+        }else{
+            return "BAD syntax";
+        }
+    }catch(exception e){
+        return "BAD syntax";       
+    }
+    Table * tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,tableObj,true)){
+            string function = "./DropTable.sh "+table;
+            system(function.c_str());
+            delete tableObj;
+            return "table was successfully dropped";
+        }else{
+            delete tableObj;
+            return "you don't have permission to do that";
+        }
+    }else{
+        delete tableObj;
+        return "table you have entered does not exist";
+    }
+    
+        
+}
 
 string Database::toString(string pTableName) //ked tabulka existuje
 {
@@ -607,6 +660,41 @@ string Database::toString(string pTableName) //ked tabulka existuje
 	tbl->initTable();
 	return tbl->toStringTable();
 	
+}
+
+string Database::getAllTables(string command) {
+    ofstream file;
+    command = "./getTables.sh";
+    string tmp = "";
+    file.open("vystup.txt");
+    if(file.is_open()){
+        file << tmp;
+
+        system(command.c_str());
+    }else{
+       system(command.c_str()); 
+    }
+    file.close();
+    ifstream file1;
+    file1.open("vystup.txt");
+    command = "";
+    while(!file1.eof()){
+        getline(file1,tmp);
+        command += tmp +"\n";
+    }
+    size_t position = command.find("vystup.txt\n");
+    if(position != string::npos){
+        command.erase(position,11);
+    }
+    while(1){
+        position = command.find(".txt");
+        if(position != string::npos){
+            command.erase(position,4);
+        }else{
+            break;
+        }
+    }
+    return command;
 }
 
 Database::~Database()

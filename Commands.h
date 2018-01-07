@@ -12,6 +12,7 @@ enum Prikazy //mozne prikazy
         UPDATE,
         DELETE,
         INSERT,
+        getTables,
         myClose,
 };
 
@@ -25,6 +26,8 @@ inline Prikazy checkInput(std::string command) //ropoznavanie prikazov
         if (command == "UPDATE"){return UPDATE;}
         if (command == "DELETE"){return DELETE;}
         if (command == "INSERT"){return INSERT;}
+        if (command == "GET"){return getTables;}
+        if (command == "DROP"){return DropTable;}
         if (command == "close"){return myClose;}
 	return Prikazy::ZlyPrikaz;
 }

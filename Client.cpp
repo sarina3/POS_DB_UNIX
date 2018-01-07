@@ -124,6 +124,14 @@ void Client::work() {
                 msg = this->sendMessage(msg);
                 tmp = false;
                 break;
+            case getTables:
+                msg = this->getTablesAll();
+                msg = this->sendMessage(msg);
+                break;
+            case DropTable:
+                msg = this->dropTable();
+                msg = this->sendMessage(msg);
+                break;
             default:
                 msg = "zly  prikaz";
                 break;
@@ -501,6 +509,20 @@ void Client::createTable(){
 
     
     
+}
+
+string Client::dropTable() {
+    string command = "DROP;";
+    string tmp = "";
+    cout << "zadajte nazov Tabulky ktoru chcete zmazat:"<<endl;
+    getline(cin,tmp);
+    command += tmp;
+    return command;
+}
+
+string Client::getTablesAll() {
+    string command = "GET";
+    return command;
 }
 
 bool Client::checkTypesOfColums(string typ, string prikaz){
