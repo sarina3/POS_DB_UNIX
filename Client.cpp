@@ -150,6 +150,9 @@ void Client::work() {
                 msg = this->sendMessage(msg);
                 tmp = false;
                 break;
+            case CreateTable:
+                this->createTable();
+                break;
             default:
                 msg = "zly  prikaz";
                 break;
