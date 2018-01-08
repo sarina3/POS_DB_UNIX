@@ -38,6 +38,10 @@ public:
     string update();
     string dropTable();
     string getTablesAll();
+    string getTablesMy();
+    string chmodfunc();
+    string shutDown();
+    string chmodreverse();
     string deleteFromTable();
     bool checkTypesOfColums(string typ, string prikaz);
     bool checDuplicatesOfPKandNotNullRows(string vstup);

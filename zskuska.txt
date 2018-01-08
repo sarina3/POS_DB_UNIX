@@ -1,1 +1,4 @@
-kekeciny
+prava,adam,admin,jakub,typPrava,x+r+w,columns,id,meno,priezvisko,kraj,typ,int,string,string,string,PK,id,x,x,x,NN,id,meno,priezvisko,x,rows,
+1,Milos,Foltan,ZA;
+3,Milos,Foltan,ZA;
+4,Jakub,Sarina,BB;

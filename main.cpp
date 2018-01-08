@@ -25,7 +25,6 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    
     int tmp = 0;
     cout << "1 - server \n"
             "2 - client \n";
@@ -47,13 +46,13 @@ int main(int argc, char** argv) {
         }
         delete cli;
     }
-    
+   
     /*
     Database *data = new Database();
     //cout << data->toString("TabulkaVzor");
     //vytvaranie tabulky
     //data->createTable("test");
-    cout << data->getAllTables("get");
+    cout << data->getMyTables("get","adam");
     */
     return 0;
     

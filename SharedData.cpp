@@ -31,9 +31,13 @@ SharedData::SharedData(const SharedData& orig) {
 SharedData::~SharedData() {
     delete toDo;
     delete activeSockets;
+    delete threads;
+    delete results;
+    pthread_mutex_destroy(&mutexResults);
     pthread_mutex_destroy(&mutexSockets);
     pthread_mutex_destroy(&mutexThreads);
     pthread_mutex_destroy(&mutexToDo);
+    pthread_cond_destroy(&condResults);
     pthread_cond_destroy(&condSockets);
     pthread_cond_destroy(&condThreads);
     pthread_cond_destroy(&condToDo);

@@ -1,4 +1,5 @@
 #include "Database.h"
+#include "Logins.h"
 
 
 Database::Database()
@@ -113,8 +114,6 @@ string Database::select(string command, string user,string usage) {
     string result ="";
     stringstream resulttmp;
     Table* tableObj = new Table(table);
-    
-    
     if(tableObj->initTable()){
         if(selecting == "*"){
             selecting = "";
@@ -275,8 +274,12 @@ string Database::select(string command, string user,string usage) {
             delete tableObj;
             return newResult;
         }else{
+            delete tableObj;
             return "you don't have permission to do that";
         }
+    }else{
+        delete tableObj;
+        return "table that name does not exist";
     }
 }
 //DELETE;Table;conditions
@@ -316,17 +319,19 @@ string Database::deleteFromTable(string command, string user) {
                 }
             }
         if(tableObj->writeTableToFile()){
-           return ids.size() + " rows was successfully deleted";
+            delete tableObj;
+           return " rows was successfully deleted";
         }else{
+            delete tableObj;
             return "something went wrong";
         }
-        delete tableObj;
-        return "rows was successfully deleted";
         }else{
+            delete tableObj;
             return "you don't have permission to do that";
         }
         
     }else{
+        delete tableObj;
         return "table with that name doesn't exist";
     }
 }
@@ -404,9 +409,18 @@ string Database::update(string command, string user) {
                 delete tableObj;
                 return "columns was updated successfully";
             }else{
+                delete  valuesParsed;
+                delete  tableObj;
+                delete  colmunsParsed;
                 return "number of columns and number of values to update don't match";
             }
+        }else{
+            delete  tableObj;
+            return "you dont have permission to do that";
         }
+    }else{
+        delete  tableObj;
+        return "table with that name does not exist";
     }
 }
 //INSERT;table;columns;values
@@ -457,6 +471,8 @@ string Database::insert(string command, string user) {
             }
             
             if(counter != counterNN){
+                delete  columnsParsed;
+                delete  tableObj;
                 return "not all Not Null columns filled";
             }
             vector<string> *valuesParsed = new vector<string>();
@@ -525,9 +541,11 @@ string Database::insert(string command, string user) {
             delete tableObj;
             return "row was inserted successfully";
         }else{
+            delete  tableObj;
             return "you dont have permission to do that";
          }
     }else{
+        delete tableObj;
         return "table you want to insert into does not exist";
     }
 }   
@@ -697,6 +715,219 @@ string Database::getAllTables(string command) {
     return command;
 }
 
+string Database::chmodrev(string command, string user) {
+    string function;
+    string table;
+    string users;
+    size_t position;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        table = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        if(position == string::npos){
+            users = command;
+        }else{
+            return "BAD syntax";
+        }
+    }catch(exception e){
+        return "BAD syntax";
+    }
+    Table *tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,tableObj,true)){
+            vector<string> *usersParsed = new vector<string>();
+            while(1){
+                position = users.find(",");
+                if(position == string::npos){
+                    bool canBeRemoved;
+                    if(tableObj->prava->size() <= 2){
+                        canBeRemoved = true;
+                        for(int i = 0 ; i < tableObj->prava->size() ; i++){
+                            if(users == tableObj->prava->at(i)){
+                                canBeRemoved = false;
+                            }
+                        }
+                        if(canBeRemoved){
+                            usersParsed->push_back(users);
+                        }
+                    }else{
+                        canBeRemoved = true;
+                        for(int i = 0 ; i < 2 ; i++){
+                            if(users == tableObj->prava->at(i)){
+                                canBeRemoved = false;
+                            }
+                        }
+                        if(canBeRemoved){
+                            usersParsed->push_back(users);
+                        }
+                    }
+                    break;
+                }
+                bool canBeRemoved;
+                if(tableObj->prava->size() <= 2){
+                        canBeRemoved = true;
+                        for(int i = 0 ; i < tableObj->prava->size() ; i++){
+                            if(users.substr(0,position) == tableObj->prava->at(i)){
+                                canBeRemoved = false;
+                            }
+                        }
+                        if(canBeRemoved){
+                            usersParsed->push_back(users.substr(0,position));
+                        }
+                }else{
+                    canBeRemoved = true;
+                        for(int i = 0 ; i < 2 ; i++){
+                            if(users.substr(0,position) == tableObj->prava->at(i)){
+                                canBeRemoved = false;
+                            }
+                        }
+                        if(canBeRemoved){
+                            //cout << users.substr(0,position);
+                            usersParsed->push_back(users.substr(0,position));
+                        }
+                }
+                users.erase(0,position +1);
+            }
+            for(string iter : *usersParsed){
+                int index = -1;
+                for(int i = 0 ; i < tableObj->prava->size(); i++){
+                    if(iter == tableObj->prava->at(i)){
+                        index = i;
+                        break;
+                    }
+                }
+                //cout << index << endl;
+                if(index != -1){
+                    for(int i = index; i < tableObj->prava->size() -1;i++){
+                        tableObj->prava->at(i) = tableObj->prava->at(i+1);
+                    }
+                    tableObj->prava->pop_back();
+                }
+            }
+            tableObj->writeTableToFile();
+            delete tableObj;
+            delete usersParsed;
+            return "rights was updated succesfully";
+        }else{
+            delete tableObj;
+            return "you dont have permission to do that";
+        }
+    }else{
+        delete tableObj;
+        return "table with that name does not exist";
+    }
+}
+
+string Database::getMyTables(string command, string user) {
+    string tables = this->getAllTables(command);
+    vector<string> *tablesParsed = new vector<string>();
+    size_t position;
+    while(1){
+        position = tables.find("\n");
+        
+        if(position == string::npos){
+            break;
+        }
+        
+        if(tables.substr(0,position) != ""){
+            tablesParsed->push_back(tables.substr(0,position));
+        }else{
+            break;
+        }
+        tables.erase(0,position + 1);
+    }
+    
+    command = "";
+    for(string table : *tablesParsed){
+        Table * tableObj = new Table(table);
+        if(tableObj->initTable()){
+           
+            if(this->check(user,tableObj,true)){
+                command += table + "\n";
+            }
+        }
+        delete tableObj;
+    }
+    delete tablesParsed;
+    return command;
+        
+}
+
+//CHMOD;table;users
+string Database::chmod(string command, string user) {
+    string function;
+    string table;
+    string users;
+    size_t position;
+    try{
+        position = command.find(";");
+        function = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        table = command.substr(0,position);
+        command.erase(0,position +1);
+        position = command.find(";");
+        if(position == string::npos){
+            users = command;
+        }else{
+            return "BAD syntax";
+        }
+    }catch(exception e){
+        return "BAD syntax";
+    }
+    Table* tableObj = new Table(table);
+    if(tableObj->initTable()){
+        if(this->check(user,tableObj,true)){
+            vector<string> *usersParsed = new vector<string>();
+            while(1){
+                position = users.find(",");
+                if(position == string::npos){
+                    usersParsed->push_back(users);
+                    break;
+                }
+                usersParsed->push_back(users.substr(0,position));
+                users.erase(0,position +1);
+            }
+            int counter = 0;
+            Logins *log = new Logins();
+            for(int i = 0 ; i < usersParsed->size();i++){
+                if(log->findUser(usersParsed->at(i))){
+                    counter++;
+                }
+            }
+            bool hasRights;
+            for(string iter : *usersParsed){
+                hasRights = false;
+                for(string iterExist : *tableObj->prava){
+                    if(iter == iterExist){
+                        hasRights = true;
+                    }
+                }
+                if(!hasRights){
+                    tableObj->prava->push_back(iter);
+                }
+            }
+            tableObj->writeTableToFile();
+            delete tableObj;
+            delete log;
+            delete usersParsed;
+            return "rights was upda successfully";
+        }else{
+            delete tableObj;
+            return "you don't have permission to do that";
+        }
+    }else{
+        delete tableObj;
+        return "table with that name does not exist";
+    }
+ }
+
+
 Database::~Database()
 {
+    
 }

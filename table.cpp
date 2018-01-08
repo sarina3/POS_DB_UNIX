@@ -205,4 +205,11 @@ bool Table::writeTableToFile() //metoda sa da volat len po poriadnom vytvoreni t
 
 Table::~Table()
 {
+    delete columns;
+    delete notNull;
+    delete pk;
+    delete prava;
+    delete rowsVector;
+    delete typ;
+    delete typPrava;
 }

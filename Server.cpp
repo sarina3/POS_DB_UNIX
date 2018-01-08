@@ -44,6 +44,7 @@ void* server::something() {
     string user;
     int socketNum;
     bool noReturn;
+    this->endProgram = false;
     while(1){
         toDo = "";
         noReturn = false;
@@ -102,9 +103,21 @@ void* server::something() {
             case getTables:
                 toDo = this->database->getAllTables(toDo);
                 break;
+            case chmod:
+                toDo = this->database->chmod(toDo,user);
+                break;
+            case chmodrev:
+                toDo = this->database->chmodrev(toDo,user);
+                break;
+            case EndProgram:
+                this->shutDown(user);
+                break;
             default:
                 toDo = "command you have entered does not exist";
                 break;
+        }
+        if(endProgram){
+            break;
         }
         // sem pride bud switch alebo daco ine co bude volat funkcie  podla prikazu v Stringu
         if(!noReturn){
@@ -117,7 +130,29 @@ void* server::something() {
         pthread_mutex_unlock(&this->data->mutexResults);
         }
     }
+    
 }
+
+void server::shutDown(string user) {
+    if(user == "admin"){
+        
+        pthread_mutex_lock(&data->mutexThreads);
+        for(int i = data->activeSockets->size() - 1 ; i < 0 ;i--){
+           cout << i;
+           pthread_cancel(*data->threads->at(i));
+           delete data->threads->at(i);
+           data->threads->pop_back();
+        }
+        pthread_mutex_unlock(&data->mutexThreads);
+        pthread_mutex_lock(&data->mutexSockets);
+        for(int i = 0 ; i < data->activeSockets->size();i++){
+            close(data->activeSockets->at(i));
+        }
+        pthread_mutex_unlock(&data->mutexSockets);
+        this->endProgram = true;
+    }
+}
+
 void server::Myclose(int socketnum) {
     pthread_mutex_lock(&this->data->mutexSockets);
     int index;
@@ -142,13 +177,13 @@ void server::Myclose(int socketnum) {
     pthread_mutex_unlock(&data->mutexThreads);
     //delete tmp;
     close(socketnum);
+    
     cout << "conection with number" << socketnum << "was closed successfully" << endl;
 }
 
 void* server::listening(void* pdata){
     SharedData *data = (SharedData*)(pdata);
     int socketf,newsocket;
-    Logins *log = new Logins();
     if(data ->activeSockets->size() > 0){
         pthread_mutex_lock(&data->mutexSockets);
         socketf = data->activeSockets->at(data->activeSockets->size() - 1);
@@ -171,7 +206,9 @@ void* server::listening(void* pdata){
         str = str.erase(0,position + 1);
         string passwd = str;
         cout << username << endl << passwd << endl;
+        Logins *log = new Logins();
         if(log->checkUserAndPass(username,passwd)){
+            delete log;
             str = "succeed";
             send(newsocket,str.c_str(),255,0);
             pthread_t thread;
@@ -186,6 +223,7 @@ void* server::listening(void* pdata){
             pthread_mutex_unlock(&data->mutexThreads);
         }else {
             str = "wrong";
+            delete log;
             send(newsocket,str.c_str(),255,0);
             close(newsocket);
         }
@@ -197,6 +235,7 @@ void* server::listening(void* pdata){
     
     
     }
+    
     data = NULL;
     pthread_exit(NULL);
 }
@@ -228,10 +267,13 @@ void* server::work(void* pdata){
         message.erase(0,position+1);
         cout << message << endl;
         if(message == "close"){
-            cout << "som tu" << endl;
             message = "closing connection";
             send(socketf,message.c_str(),maxPacketSize,0);
             close = true;
+        }
+        if(message == "shutDown"){
+            message = "closing connection";
+            send(socketf,message.c_str(),maxPacketSize,0);
         }
         message = msg;
         stringstream str;
@@ -271,6 +313,7 @@ void* server::work(void* pdata){
         send(socketf,message.c_str(),maxPacketSize,0);
         
     }
+    
     cout << "koncim" << endl;
     data = NULL;
     pthread_cancel(pthread_self());
@@ -282,5 +325,7 @@ server::server(const server& orig) {
 }
 
 server::~server() {
+    delete this->data;
+    delete this->database;
 }
 

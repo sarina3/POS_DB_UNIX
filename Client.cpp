@@ -14,7 +14,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "Client.h"
-#include "Server.h"
+//#include "Server.h"
+#include <vector>
 #include "Commands.h"
 
 Client::Client(){
@@ -128,9 +129,26 @@ void Client::work() {
                 msg = this->getTablesAll();
                 msg = this->sendMessage(msg);
                 break;
+            case getMyTables:
+                msg = this->getTablesMy();
+                msg = this->sendMessage(msg);
+                break;
             case DropTable:
                 msg = this->dropTable();
                 msg = this->sendMessage(msg);
+                break;
+            case chmod:
+                msg = this->chmodfunc();
+                msg = this->sendMessage(msg);
+                break;
+            case chmodrev:
+                msg = this->chmodreverse();
+                msg = this->sendMessage(msg);
+                break;
+            case EndProgram:
+                msg = this->shutDown();
+                msg = this->sendMessage(msg);
+                tmp = false;
                 break;
             default:
                 msg = "zly  prikaz";
@@ -140,6 +158,36 @@ void Client::work() {
         msg == "";
     }
 }
+
+string Client::chmodfunc() {
+    string command = "CHMOD;";
+    string tmp;
+    cout << "zadajte tabulku v ktorej chcete upravovat prava:" <<endl;
+    getline(cin,tmp);
+    command += tmp + ";";
+    cout << "zadajte pouzivatelov ktorim chcete pridat prava (oddelovac , napr.: jozef,kubo):"<< endl;
+    getline(cin,tmp);
+    command += tmp;
+    return command;
+}
+
+string Client::shutDown() {
+    string command = "shutDown";
+    return command;
+}
+
+string Client::chmodreverse() {
+    string command = "CHMOD-;";
+    string tmp;
+    cout << "zadajte tabulku do ktorej chcete upravovat prava:" <<endl;
+    getline(cin,tmp);
+    command += tmp + ";";
+    cout << "zadajte pouzivatelov ktorim chcete odobrat prava (oddelovac , napr.: jozef,kubo):"<< endl;
+    getline(cin,tmp);
+    command += tmp;
+    return command;
+}
+
 string Client::select() {
     string message = "SELECT;";
     string tmp;
@@ -524,6 +572,10 @@ string Client::getTablesAll() {
     string command = "GET";
     return command;
 }
+string Client::getTablesMy() {
+    string command = "GETMY";
+    return command;
+}
 
 bool Client::checkTypesOfColums(string typ, string prikaz){
     if(prikaz == "nemoze"){
@@ -568,5 +620,6 @@ Client::Client(const Client& orig) {
 }
 
 Client::~Client() {
+    
 }
 
