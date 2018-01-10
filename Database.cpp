@@ -138,7 +138,6 @@ string Database::select(string command, string user,string usage) {
                         break;
                     }
                 }
-                
                 for(int i = 0 ; i < conditionParsed->size();i++){
                     string tmp = conditionParsed->at(i);
                     string operand;
@@ -161,8 +160,11 @@ string Database::select(string command, string user,string usage) {
                         }
                     }
                     if(index == -1){
+                        delete conditionParsed;
+                        delete tableObj;
                         return "column name doesn't exist";
                     }
+                    cout << tableObj->typ->at(index) << endl;
                     if(i == 0){
                         for(int j= 0 ; j < tableObj->rowsVector->size() / tableObj->columns->size() ; j++){
                             if(this->porovnaj(tableObj->rowsVector->at(index + j*tableObj->columns->size()),tmp,tableObj->typ->at(index),operand)){
@@ -171,7 +173,7 @@ string Database::select(string command, string user,string usage) {
                         }
                         result = resulttmp.str();
                     }else{
-                        resulttmp.clear();
+                        resulttmp.str("");
                         for(char& j : result){
                             if(this->porovnaj(tableObj->rowsVector->at(index + ((int)j -48)*tableObj->columns->size()),tmp,tableObj->typ->at(index),operand)){
                                 resulttmp << j;
@@ -243,6 +245,8 @@ string Database::select(string command, string user,string usage) {
                         }
                     }
                     if(index == -1){
+                        delete selectingParsed;
+                        delete tableObj;
                         return "column name doesn't exist";
                     }
                     break;
@@ -256,11 +260,15 @@ string Database::select(string command, string user,string usage) {
                     }
                 }
                 if(index == -1){
+                    delete selectingParsed;
+                    delete tableObj;
                     return "column name doesn't exist";
                 }
                 selecting.erase(0,position + 1);
             }
             if(usage == "function"){
+                delete selectingParsed;
+                delete tableObj;
                 return result;
             }
             string newResult = "";
@@ -320,7 +328,7 @@ string Database::deleteFromTable(string command, string user) {
             }
         if(tableObj->writeTableToFile()){
             delete tableObj;
-           return " rows was successfully deleted";
+           return "rows was successfully deleted";
         }else{
             delete tableObj;
             return "something went wrong";
@@ -528,6 +536,7 @@ string Database::insert(string command, string user) {
             stringstream pom;
             for(int i = 0 ; i < tableObj->rowsVector->size();i++){
                 if(tableObj->rowsVector->at(i) == ""){
+                    tableObj->rowsVector->at(i) = "|";
                     pom << "|";
                 }else{
                     pom << tableObj->rowsVector->at(i);
@@ -924,7 +933,28 @@ string Database::chmod(string command, string user) {
         delete tableObj;
         return "table with that name does not exist";
     }
- }
+}
+
+string Database::zapisCreate(string createMsg) {
+    string function;
+    string table;
+    size_t position;
+    try{
+        position = createMsg.find(";");
+        function = createMsg.substr(0,position);
+        createMsg.erase(0,position+1);
+        position = createMsg.find(";");
+        table = createMsg.substr(0,position);
+        createMsg.erase(0,position+1);
+    }catch(exception e){
+        return "BAD syntax";
+    }
+    ofstream file;
+    file.open(table + ".txt");
+    file << createMsg;
+    file.close();
+    return "table was created successfully"; 
+}
 
 
 Database::~Database()

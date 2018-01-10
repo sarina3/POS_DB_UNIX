@@ -26,7 +26,8 @@ Client::Client(){
 
 int Client::connection(int portNumber) {
     socketf = socket(AF_INET,SOCK_STREAM,0);
-    
+    int yes = 1;
+    setsockopt(socketf, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     if(inet_addr(adress.c_str()) == -1){
         
         hostent *host;
@@ -151,7 +152,7 @@ void Client::work() {
                 tmp = false;
                 break;
             case CreateTable:
-                this->createTable();
+                msg = this->createTable();
                 break;
             default:
                 msg = "zly  prikaz";
@@ -266,7 +267,8 @@ string Client::deleteFromTable() {
 
 
 
-void Client::createTable(){
+string Client::createTable(){
+    string nazovTbl = "";
     string createTable = "";
     string prikaz = "";
     string odpovedServer = "";
@@ -274,9 +276,38 @@ void Client::createTable(){
     {
         cout << "[VyvaranieTabulky]: Zadajte nazov tabulky alebo ukoncite [EXIT] \n";
         cin >> prikaz;
-        if(prikaz == "EXIT" || prikaz == "exit"){return;} //ked stlaci exit koncime hned
+        if(prikaz == "EXIT" || prikaz == "exit"){return "";} //ked stlaci exit koncime hned
         if(prikaz == "end"){break;} //len na testovanie
         if(prikaz != ""){
+            odpovedServer = sendMessage("GET");
+            vector<string> *vytvoreneTabulky = new vector<string>();
+            size_t position;
+            while(1){
+                position = odpovedServer.find("\n");
+                if(position == string::npos){
+                    if(odpovedServer != ""){
+                        vytvoreneTabulky->push_back(odpovedServer);
+                    }
+                    break;
+                }
+                if(odpovedServer.substr(0,position) != ""){
+                    vytvoreneTabulky->push_back(odpovedServer.substr(0,position));
+                }
+                odpovedServer.erase(0,position+1);
+            }
+            bool exist = false;
+            for(string tmp : *vytvoreneTabulky){
+                if(tmp == prikaz){
+                    exist = true;
+                }
+            }
+            delete vytvoreneTabulky;
+            if(!exist){
+                odpovedServer = "OK";
+                nazovTbl = prikaz;
+                prikaz = "CreateTable;" + prikaz;
+                sendMessage(prikaz);
+            }
            // sendMessage(prikaz); // odpoved ci existuje tabulka
             if(odpovedServer == "OK"){
                 cout << "Tabulka uspesne vytvorena! \n";
@@ -468,6 +499,8 @@ void Client::createTable(){
         //zadavanie rows
         //tu uz je hotova tabulka
         end = true;
+        delete pom;
+        delete stlpce;
     }
     end = false;
 
@@ -553,8 +586,16 @@ void Client::createTable(){
     //kontrola TEST
     //cout << "test\n";
     //cout << createTable;
+    createTable = "InitTable;" + nazovTbl + ";" + createTable;
+    createTable = this->sendMessage(createTable);
+    delete notnull;
+    delete pk;
+    delete rows;
+    delete stlpce2;
+    delete typColumn;
     
-    //ODOSLANIE NA SERVER TABULKy
+    return createTable;
+    
     end = true;
 
 

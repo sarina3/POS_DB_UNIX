@@ -7,6 +7,7 @@ enum Prikazy //mozne prikazy
 	AlterTable,
 	DropTable,
 	EndProgram,
+        InitTable,
 	ZlyPrikaz,
         SELECT,
         UPDATE,
@@ -30,6 +31,7 @@ inline Prikazy checkInput(std::string command) //ropoznavanie prikazov
         if (command == "DELETE"){return DELETE;}
         if (command == "INSERT"){return INSERT;}
         if (command == "GET"){return getTables;}
+        if (command == "InitTable"){return InitTable;}
         if (command == "shutDown"){return EndProgram;}
         if (command == "GETMY"){return getMyTables;}
         if (command == "DROP"){return DropTable;}

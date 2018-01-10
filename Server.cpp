@@ -22,19 +22,20 @@ server::server(int portNumber) {
     
     this->database = new Database();
     this->data = new SharedData();
-
     this->maxPacketSize = 255;
     this->socketf = socket(AF_INET,SOCK_STREAM,0);
+    int yes = 1;
+    setsockopt(socketf, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     memset(&server_addr,0,sizeof(server_addr));
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(portNumber);
     bind(socketf,(sockaddr *)&server_addr,sizeof(server_addr));
     this->data->activeSockets->push_back(socketf);
-    pthread_t *thread;      
-    void* (*listeening)(void*) = listening;
-    pthread_create(thread,NULL,listeening,data);
-    data->threads->push_back(thread);
+    pthread_t thread;      
+    //void* (*listeening)(void*) = listening;
+    pthread_create(&thread,NULL,listening,this->data);
+    this->data->threads->push_back(thread);
     
 }
 
@@ -83,6 +84,7 @@ void* server::something() {
                 break;
             case CreateTable:
                 toDo = this->database->createTable(toDo); //navratova hodnota pre klienta,
+                        
                 break;
             case INSERT:
                 toDo = this->database->insert(toDo,user);
@@ -103,6 +105,9 @@ void* server::something() {
             case getTables:
                 toDo = this->database->getAllTables(toDo);
                 break;
+            case getMyTables:
+                toDo= this->database->getMyTables(toDo,user);
+                break;
             case chmod:
                 toDo = this->database->chmod(toDo,user);
                 break;
@@ -110,8 +115,13 @@ void* server::something() {
                 toDo = this->database->chmodrev(toDo,user);
                 break;
             case EndProgram:
+                this->Myclose(socketNum);
                 this->shutDown(user);
                 break;
+            case InitTable:
+                toDo = this->database->zapisCreate(toDo);
+                break;
+               
             default:
                 toDo = "command you have entered does not exist";
                 break;
@@ -135,21 +145,22 @@ void* server::something() {
 
 void server::shutDown(string user) {
     if(user == "admin"){
-        
-        pthread_mutex_lock(&data->mutexThreads);
-        for(int i = data->activeSockets->size() - 1 ; i < 0 ;i--){
-           cout << i;
-           pthread_cancel(*data->threads->at(i));
-           delete data->threads->at(i);
-           data->threads->pop_back();
-        }
-        pthread_mutex_unlock(&data->mutexThreads);
         pthread_mutex_lock(&data->mutexSockets);
         for(int i = 0 ; i < data->activeSockets->size();i++){
             close(data->activeSockets->at(i));
         }
         pthread_mutex_unlock(&data->mutexSockets);
+        pthread_mutex_lock(&data->mutexThreads);
+       
+        for(int i = 0 ; i < data->threads->size() ;i++){
+           //cout << i << endl;
+           pthread_cancel(data->threads->at(i));
+           //delete data->threads->at(i);
+           
+        }
+        pthread_mutex_unlock(&data->mutexThreads);
         this->endProgram = true;
+        
     }
 }
 
@@ -219,7 +230,7 @@ void* server::listening(void* pdata){
             data->activeSockets->push_back(newsocket);
             pthread_mutex_unlock(&data->mutexSockets);
             pthread_mutex_lock(&data->mutexThreads);
-            data->threads->push_back(&thread);
+            data->threads->push_back(thread);
             pthread_mutex_unlock(&data->mutexThreads);
         }else {
             str = "wrong";
@@ -274,6 +285,7 @@ void* server::work(void* pdata){
         if(message == "shutDown"){
             message = "closing connection";
             send(socketf,message.c_str(),maxPacketSize,0);
+            close = true;
         }
         message = msg;
         stringstream str;
@@ -325,6 +337,7 @@ server::server(const server& orig) {
 }
 
 server::~server() {
+    //free(&server_addr);
     delete this->data;
     delete this->database;
 }

@@ -16,7 +16,7 @@
 SharedData::SharedData() {
     results = new vector<string>();
     toDo = new vector<string>();
-    threads = new vector<pthread_t*>();
+    threads = new vector<pthread_t>();
     activeSockets = new vector<int>();
     mutexSockets,mutexThreads,mutexToDo,mutexResults = PTHREAD_MUTEX_INITIALIZER;
     pthread_cond_init(&condSockets,NULL);

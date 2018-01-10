@@ -24,7 +24,7 @@ public:
     virtual ~SharedData();
     vector<int> *activeSockets;
     vector<string> *toDo;
-    vector<pthread_t*> *threads;
+    vector<pthread_t> *threads;
     vector<string> *results;
     pthread_mutex_t mutexResults;
     pthread_mutex_t mutexSockets;

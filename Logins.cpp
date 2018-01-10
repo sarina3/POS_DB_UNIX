@@ -1,5 +1,6 @@
-#include "Logins.h" 
 
+
+#include "Logins.h"
 using namespace std;
 
 Logins::Logins()
@@ -57,17 +58,34 @@ bool Logins::loadLoginsTXT()
 bool Logins::checkUserAndPass(string pUsername,string pPassword)
 {
 	int i = 0;
+        bool exist = false;
+        bool existUser = false;
+
 	for (string pom : *logins)
 	{
-		if (pom == pUsername && pPassword == (*passwords).at(i)) { //passwords
-			
-			return true;
-		}
-		i++;
-	}
-	return false;
-}
+            if(pom == pUsername){
+                existUser = true;
+            }
+            if (pom == pUsername && pPassword == (*passwords).at(i)) { //passwords
 
+                    exist = true;
+                    break;
+            }
+            i++;
+	}
+	if(!exist && !existUser){
+            ofstream file;
+            file.open("logins.TXT");
+            for(int i = 0 ; i < this->logins->size();i++){
+                file << this->logins->at(i) << ";" << this->passwords->at(i) << ";\n";
+            }
+            file << pUsername<<";"<<pPassword<<";\n";
+            file.close();
+            exist = true;
+        }
+        return exist;
+
+}
 
 Logins::~Logins()
 {

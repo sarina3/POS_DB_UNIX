@@ -25,6 +25,7 @@ public:
         bool check(string user,Table* table,bool owner);
         bool porovnaj(string clenzpola, string clenfixny, string typ,string operand);
 	string toString(string pTableName);
+        string zapisCreate(string createMsg);
 	~Database();
 };
 

@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     
     
     if(tmp == 1){
-        server *serv = new server(1027);
+        server *serv = new server(1026);
         serv->something();
         delete serv;
     }if(tmp == 2){
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
         //cout << "main";x
         //cout << cli->connection(1027) << endl;
         //cout << "main alive \n ";
-        if(cli->connection(1027) == 1){
+        if(cli->connection(1026) == 1){
             cli->work();
         }
         delete cli;

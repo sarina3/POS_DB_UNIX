@@ -30,7 +30,7 @@ public:
     int connection(int portNumber);
     void work();
     string sendMessage(string message);
-    void createTable();
+    string createTable();
     Client(const Client& orig);
     string login();
     string select();
